@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>HSK 4 — Audio Visual · 600 Characters</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700;900&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--red:#E8002A;--gold:#FFB800;--ink:#08080D;--paper:#F0EBE0;--jade:#2EAD6E;--dim:#ffffff12;--safe-bottom:env(safe-area-inset-bottom,0px);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--ink);color:var(--paper);font-family:'DM Mono',monospace;display:flex;flex-direction:column;touch-action:pan-y;}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;padding:10px 16px;gap:12px;border-bottom:1px solid var(--dim);flex-shrink:0;background:#0A0A0F;}
+.topbar .logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:4px;color:var(--red);}
+.topbar .logo span{color:var(--gold);}
+.topbar .mode{font-size:.5rem;letter-spacing:2px;color:#ffffff40;text-transform:uppercase;}
+.counter{margin-left:auto;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);letter-spacing:2px;}
+.counter small{font-size:.55rem;color:#ffffff30;font-family:'DM Mono',monospace;}
+
+/* PROGRESS */
+.prog-wrap{flex-shrink:0;padding:0 16px;background:#0A0A0F;}
+.prog-bar{height:3px;background:var(--dim);border-radius:2px;margin:6px 0;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));border-radius:2px;transition:width .3s;}
+
+/* MAIN STAGE */
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:8px 16px;min-height:0;}
+.stage-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.03;font-family:'Noto Sans SC',sans-serif;font-size:40vw;font-weight:900;pointer-events:none;user-select:none;color:#fff;}
+
+/* Character — size scales down via JS based on char count */
+.char-main{font-family:'Noto Sans SC',sans-serif;font-weight:900;color:var(--paper);line-height:1.05;z-index:1;animation:fadeUp .4s ease;text-align:center;width:100%;word-break:break-all;}
+.pinyin-main{font-size:clamp(.9rem,3.5vw,1.6rem);color:var(--gold);letter-spacing:3px;margin-top:4px;z-index:1;animation:fadeUp .4s ease .1s both;text-align:center;}
+.meaning-main{font-size:clamp(.8rem,3vw,1.1rem);color:#ffffffcc;margin-top:8px;z-index:1;animation:fadeUp .4s ease .2s both;text-align:center;max-width:90%;line-height:1.5;}
+.pos-badge{display:inline-block;font-size:.5rem;letter-spacing:2px;padding:3px 10px;border-radius:2px;margin-top:4px;text-transform:uppercase;z-index:1;animation:fadeUp .4s ease .15s both;}
+.pos-n{background:#1a3a5c;color:#7ab4e0;}
+.pos-v{background:#3a1a1a;color:#e07a7a;}
+.pos-adj{background:#1a3a1a;color:#7ae07a;}
+.pos-adv{background:#3a2a1a;color:#e0b47a;}
+.pos-conj{background:#2a1a3a;color:#b47ae0;}
+.pos-prep{background:#1a3a3a;color:#7ae0e0;}
+.pos-other{background:#222;color:#aaa;}
+
+/* Example sentence — toggleable */
+.example-wrap{z-index:1;animation:fadeUp .4s ease .3s both;text-align:center;margin-top:8px;max-width:90%;}
+.example-main{font-size:clamp(.78rem,3vw,1rem);color:#ffffffaa;line-height:1.7;font-family:'Noto Sans SC',sans-serif;}
+.example-en{font-size:clamp(.65rem,2.5vw,.85rem);color:#ffffff35;font-family:'DM Mono',monospace;margin-top:2px;line-height:1.5;}
+.example-wrap.hidden{display:none;}
+
+/* Timer ring */
+.timer-ring{position:absolute;bottom:12px;right:16px;width:40px;height:40px;}
+.timer-ring svg{width:40px;height:40px;transform:rotate(-90deg);}
+.timer-ring circle{fill:none;stroke-width:3;}
+.timer-bg{stroke:#ffffff10;}
+.timer-fg{stroke:var(--gold);stroke-dasharray:126;stroke-dashoffset:0;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+/* SWIPE hint */
+.swipe-hint{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);font-size:.5rem;color:#ffffff18;letter-spacing:2px;white-space:nowrap;pointer-events:none;}
+
+/* BOTTOM CONTROLS — phone optimised */
+.controls{flex-shrink:0;background:#0A0A0F;border-top:1px solid var(--dim);padding:10px 12px calc(10px + var(--safe-bottom));display:flex;flex-direction:column;gap:8px;}
+.ctrl-row{display:flex;align-items:center;gap:8px;justify-content:center;}
+.ctrl{padding:9px 16px;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--dim);background:none;color:#ffffff60;border-radius:4px;cursor:pointer;transition:all .2s;white-space:nowrap;flex:1;min-width:0;}
+.ctrl:hover,.ctrl:active{color:var(--paper);border-color:#ffffff40;}
+.ctrl.primary{background:var(--red);border-color:var(--red);color:#fff;flex:1.5;}
+.ctrl.primary:hover,.ctrl.primary:active{background:#ff1a3a;}
+.ctrl.active{background:var(--jade);border-color:var(--jade);color:#fff;}
+.ctrl.tog-on{background:#1a3a1a;border-color:var(--jade);color:var(--jade);}
+.ctrl.rnd-on{background:#3a2a1a;border-color:var(--gold);color:var(--gold);}
+
+/* Speed row */
+.speed-row{display:flex;align-items:center;gap:6px;justify-content:center;}
+.speed-label{font-size:.5rem;color:#ffffff35;letter-spacing:1px;flex-shrink:0;}
+.speed-btns{display:flex;gap:4px;}
+.sp-btn{padding:5px 10px;font-family:'DM Mono',monospace;font-size:.58rem;border:1px solid var(--dim);background:none;color:#ffffff45;border-radius:3px;cursor:pointer;transition:all .2s;}
+.sp-btn.on{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+
+/* Start screen */
+.start-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--ink);z-index:10;transition:opacity .5s;padding:24px;}
+.start-screen.gone{opacity:0;pointer-events:none;}
+.start-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,10vw,5rem);letter-spacing:6px;color:var(--red);line-height:1;margin-bottom:4px;}
+.start-title span{color:var(--gold);}
+.start-sub{font-size:.65rem;color:#ffffff40;letter-spacing:3px;text-transform:uppercase;margin-bottom:28px;}
+.start-btn{padding:14px 44px;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;background:var(--red);border:none;color:#fff;border-radius:4px;cursor:pointer;transition:all .2s;}
+.start-btn:hover,.start-btn:active{background:var(--gold);color:var(--ink);}
+.start-note{font-size:.58rem;color:#ffffff25;letter-spacing:1px;margin-top:14px;max-width:300px;text-align:center;line-height:1.7;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">HSK<span>4</span></div>
+  <div class="mode">Audio Visual</div>
+  <div class="counter"><span id="curNum">1</span><small> / <span id="totalNum">600</span></small></div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="stage-bg" id="stageBg"></div>
+  <div class="char-main" id="charMain">加油</div>
+  <div class="pinyin-main" id="pinyinMain">jiā yóu</div>
+  <div><span class="pos-badge pos-v" id="posBadge">v</span></div>
+  <div class="meaning-main" id="meaningMain">to add oil; come on! keep it up!</div>
+  <div class="example-wrap" id="exWrap">
+    <div class="example-main" id="exMain">加油！你能做到的！</div>
+    <div class="example-en" id="exEn">Come on! You can do it!</div>
+  </div>
+  <div class="swipe-hint" id="swipeHint">← swipe to navigate →</div>
+  <div class="timer-ring" id="timerRing">
+    <svg viewBox="0 0 44 44"><circle class="timer-bg" cx="22" cy="22" r="20"/><circle class="timer-fg" id="timerCircle" cx="22" cy="22" r="20"/></svg>
+  </div>
+
+  <div class="start-screen" id="startScreen">
+    <div class="start-title">HSK<span>4</span></div>
+    <div class="start-sub">600 Characters · Audio Visual</div>
+    <button class="start-btn" onclick="startPlayer()">▶ START</button>
+    <div class="start-note">Auto-plays all 600 HSK 4 characters with native Chinese audio. Swipe left/right to navigate. Works best with sound on.</div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="ctrl-row">
+    <button class="ctrl" onclick="jumpTo(0)" title="Restart">⏮ Start</button>
+    <button class="ctrl" onclick="prev()" title="Previous">◀ Prev</button>
+    <button class="ctrl primary" id="playBtn" onclick="togglePlay()">▶ Play</button>
+    <button class="ctrl" onclick="next()" title="Next">Next ▶</button>
+  </div>
+  <div class="ctrl-row">
+    <button class="ctrl" id="exBtn" onclick="toggleExample()">📖 Examples On</button>
+    <button class="ctrl" id="sentBtn" onclick="toggleSentence()">🗣 Sentences Off</button>
+    <button class="ctrl" id="rndBtn" onclick="toggleRandom()">🔀 Random</button>
+    <button class="ctrl" id="muteBtn" onclick="toggleMute()">🔊 Sound</button>
+  </div>
+  <div class="speed-row">
+    <div class="speed-label">Pause after:</div>
+    <div class="speed-btns">
+      <button class="sp-btn" onclick="setSpeed(1)" id="sp1">1s</button>
+      <button class="sp-btn" onclick="setSpeed(3)" id="sp3">3s</button>
+      <button class="sp-btn on" onclick="setSpeed(5)" id="sp5">5s</button>
+      <button class="sp-btn" onclick="setSpeed(7)" id="sp7">7s</button>
+      <button class="sp-btn" onclick="setSpeed(10)" id="sp10">10s</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const V=[
+  {c:"爱情",p:"ài qíng",pos:"n",e:"love (romantic)",ex:"他们的爱情很美好。",ee:"Their love is beautiful."},
+  {c:"安排",p:"ān pái",pos:"v",e:"to arrange, to plan",ex:"请安排一下时间。",ee:"Please arrange the time."},
+  {c:"安全",p:"ān quán",pos:"adj",e:"safe, secure",ex:"注意安全。",ee:"Pay attention to safety."},
+  {c:"按时",p:"àn shí",pos:"adv",e:"on time, punctually",ex:"请按时完成作业。",ee:"Please finish the homework on time."},
+  {c:"按照",p:"àn zhào",pos:"prep",e:"according to, in accordance with",ex:"按照计划进行。",ee:"Proceed according to plan."},
+  {c:"百分之",p:"bǎi fēn zhī",pos:"n",e:"percent",ex:"百分之八十的人通过了。",ee:"Eighty percent of people passed."},
+  {c:"棒",p:"bàng",pos:"adj",e:"great, wonderful",ex:"你真棒！",ee:"You're amazing!"},
+  {c:"包子",p:"bāo zi",pos:"n",e:"steamed stuffed bun",ex:"我喜欢吃包子。",ee:"I love eating baozi."},
+  {c:"保护",p:"bǎo hù",pos:"v",e:"to protect, to safeguard",ex:"保护环境是我们的责任。",ee:"Protecting the environment is our responsibility."},
+  {c:"保证",p:"bǎo zhèng",pos:"v",e:"to guarantee, to ensure",ex:"我保证明天来。",ee:"I guarantee I will come tomorrow."},
+  {c:"报名",p:"bào míng",pos:"v",e:"to sign up, to register",ex:"我报名参加比赛。",ee:"I signed up for the competition."},
+  {c:"抱",p:"bào",pos:"v",e:"to hold, to hug",ex:"妈妈抱着孩子。",ee:"The mother is holding the child."},
+  {c:"抱歉",p:"bào qiàn",pos:"adj",e:"sorry, apologetic",ex:"非常抱歉！",ee:"I'm very sorry!"},
+  {c:"倍",p:"bèi",pos:"n",e:"times, -fold",ex:"这是原来的两倍。",ee:"This is twice the original."},
+  {c:"本来",p:"běn lái",pos:"adv",e:"originally, at first",ex:"本来我想去，但没去。",ee:"Originally I wanted to go, but I didn't."},
+  {c:"笨",p:"bèn",pos:"adj",e:"stupid, clumsy, slow",ex:"我有时候很笨。",ee:"Sometimes I'm really clumsy."},
+  {c:"比如",p:"bǐ rú",pos:"conj",e:"for example, for instance",ex:"比如苹果。",ee:"For example, apples."},
+  {c:"毕业",p:"bì yè",pos:"v",e:"to graduate",ex:"他去年毕业了。",ee:"He graduated last year."},
+  {c:"遍",p:"biàn",pos:"n",e:"a time, once through",ex:"请再说一遍。",ee:"Please say it one more time."},
+  {c:"标准",p:"biāo zhǔn",pos:"n",e:"standard, criterion",ex:"达到标准很难。",ee:"Meeting the standard is difficult."},
+  {c:"表格",p:"biǎo gé",pos:"n",e:"form, table",ex:"填写表格。",ee:"Fill in the form."},
+  {c:"表示",p:"biǎo shì",pos:"v",e:"to show, to indicate, to express",ex:"他表示同意。",ee:"He indicated his agreement."},
+  {c:"表演",p:"biǎo yǎn",pos:"v",e:"to perform; performance",ex:"她的表演很精彩。",ee:"Her performance was brilliant."},
+  {c:"表扬",p:"biǎo yáng",pos:"v",e:"to praise, to commend",ex:"老师表扬了他。",ee:"The teacher praised him."},
+  {c:"饼干",p:"bǐng gān",pos:"n",e:"biscuit, cookie, cracker",ex:"我喜欢吃饼干。",ee:"I like eating biscuits."},
+  {c:"并且",p:"bìng qiě",pos:"conj",e:"moreover, furthermore, and",ex:"聪明并且努力。",ee:"Smart and furthermore hardworking."},
+  {c:"博士",p:"bó shì",pos:"n",e:"PhD, doctorate",ex:"他是博士。",ee:"He has a PhD."},
+  {c:"不过",p:"bú guò",pos:"conj",e:"but, however, only",ex:"很好，不过有点贵。",ee:"Very good, but a bit expensive."},
+  {c:"不得不",p:"bù dé bù",pos:"conj",e:"have no choice but to",ex:"我不得不去。",ee:"I have no choice but to go."},
+  {c:"不管",p:"bù guǎn",pos:"conj",e:"no matter what, regardless of",ex:"不管天气，我都去。",ee:"Regardless of the weather, I'll go."},
+  {c:"不仅",p:"bù jǐn",pos:"conj",e:"not only",ex:"不仅聪明，而且努力。",ee:"Not only smart, but also hardworking."},
+  {c:"部分",p:"bù fen",pos:"n",e:"part, section, portion",ex:"这是其中一部分。",ee:"This is a part of it."},
+  {c:"擦",p:"cā",pos:"v",e:"to wipe, to erase, to clean",ex:"擦黑板。",ee:"Wipe the blackboard."},
+  {c:"猜",p:"cāi",pos:"v",e:"to guess",ex:"你猜猜看！",ee:"Take a guess!"},
+  {c:"材料",p:"cái liào",pos:"n",e:"material, data, stuff",ex:"准备材料。",ee:"Prepare the materials."},
+  {c:"参观",p:"cān guān",pos:"v",e:"to visit (a place), to look around",ex:"参观博物馆。",ee:"Visit the museum."},
+  {c:"餐厅",p:"cān tīng",pos:"n",e:"restaurant, dining hall",ex:"我们去餐厅吃饭。",ee:"Let's go to the restaurant to eat."},
+  {c:"厕所",p:"cè suǒ",pos:"n",e:"toilet, lavatory",ex:"厕所在哪里？",ee:"Where is the toilet?"},
+  {c:"差不多",p:"chà bu duō",pos:"adv",e:"almost, nearly, more or less",ex:"差不多好了。",ee:"Almost done."},
+  {c:"尝",p:"cháng",pos:"v",e:"to taste, to try",ex:"尝一尝。",ee:"Have a taste."},
+  {c:"长城",p:"cháng chéng",pos:"n",e:"the Great Wall",ex:"我去过长城。",ee:"I've been to the Great Wall."},
+  {c:"长江",p:"cháng jiāng",pos:"n",e:"the Yangtze River",ex:"长江是中国最长的河。",ee:"The Yangtze is China's longest river."},
+  {c:"场",p:"chǎng",pos:"n",e:"classifier for events; place, stage",ex:"一场比赛。",ee:"A game/match."},
+  {c:"超过",p:"chāo guò",pos:"v",e:"to surpass, to exceed",ex:"超过了目标。",ee:"Exceeded the target."},
+  {c:"乘坐",p:"chéng zuò",pos:"v",e:"to ride (a vehicle)",ex:"乘坐地铁。",ee:"Ride the subway."},
+  {c:"成功",p:"chéng gōng",pos:"v",e:"to succeed; success",ex:"他终于成功了。",ee:"He finally succeeded."},
+  {c:"成为",p:"chéng wéi",pos:"v",e:"to become, to turn into",ex:"她成为了老师。",ee:"She became a teacher."},
+  {c:"诚实",p:"chéng shí",pos:"adj",e:"honest, truthful",ex:"要做诚实的人。",ee:"Be an honest person."},
+  {c:"吃惊",p:"chī jīng",pos:"v",e:"to be startled, to be shocked",ex:"我很吃惊。",ee:"I was very shocked."},
+  {c:"重新",p:"chóng xīn",pos:"adv",e:"again, once more, re-",ex:"重新开始。",ee:"Start again."},
+  {c:"抽烟",p:"chōu yān",pos:"v",e:"to smoke (a cigarette)",ex:"请不要抽烟。",ee:"Please don't smoke."},
+  {c:"出差",p:"chū chāi",pos:"v",e:"to go on a business trip",ex:"他出差了。",ee:"He went on a business trip."},
+  {c:"出发",p:"chū fā",pos:"v",e:"to set out, to depart",ex:"明天出发。",ee:"We depart tomorrow."},
+  {c:"出生",p:"chū shēng",pos:"v",e:"to be born",ex:"他出生在北京。",ee:"He was born in Beijing."},
+  {c:"出现",p:"chū xiàn",pos:"v",e:"to appear, to emerge",ex:"问题出现了。",ee:"A problem appeared."},
+  {c:"厨房",p:"chú fáng",pos:"n",e:"kitchen",ex:"厨房很干净。",ee:"The kitchen is very clean."},
+  {c:"传真",p:"chuán zhēn",pos:"n",e:"fax, facsimile",ex:"发传真给我。",ee:"Send me a fax."},
+  {c:"窗户",p:"chuāng hu",pos:"n",e:"window",ex:"请把窗户关上。",ee:"Please close the window."},
+  {c:"词语",p:"cí yǔ",pos:"n",e:"word, term, expression",ex:"学习新词语。",ee:"Learn new vocabulary."},
+  {c:"从来",p:"cóng lái",pos:"adv",e:"always, never (in negative)",ex:"我从来不迟到。",ee:"I never arrive late."},
+  {c:"粗心",p:"cū xīn",pos:"adj",e:"careless, thoughtless",ex:"他很粗心。",ee:"He is very careless."},
+  {c:"存",p:"cún",pos:"v",e:"to store, to deposit, to exist",ex:"把钱存银行。",ee:"Deposit money in the bank."},
+  {c:"错误",p:"cuò wù",pos:"n",e:"error, mistake",ex:"承认错误。",ee:"Admit the mistake."},
+  {c:"答案",p:"dá àn",pos:"n",e:"answer, solution",ex:"找到答案了。",ee:"Found the answer."},
+  {c:"打扮",p:"dǎ ban",pos:"v",e:"to dress up, to make up",ex:"她打扮得很漂亮。",ee:"She dressed up beautifully."},
+  {c:"打扰",p:"dǎ rǎo",pos:"v",e:"to disturb, to bother",ex:"对不起，打扰一下。",ee:"Sorry to bother you."},
+  {c:"打印",p:"dǎ yìn",pos:"v",e:"to print",ex:"打印文件。",ee:"Print the document."},
+  {c:"打招呼",p:"dǎ zhāo hu",pos:"v",e:"to greet, to say hello",ex:"见面要打招呼。",ee:"Greet people when you meet them."},
+  {c:"打折",p:"dǎ zhé",pos:"v",e:"to give a discount",ex:"打八折。",ee:"20% off."},
+  {c:"打针",p:"dǎ zhēn",pos:"v",e:"to give/have an injection",ex:"去打针了。",ee:"Going for an injection."},
+  {c:"大概",p:"dà gài",pos:"adv",e:"roughly, probably, about",ex:"大概需要一小时。",ee:"It takes roughly one hour."},
+  {c:"大使馆",p:"dà shǐ guǎn",pos:"n",e:"embassy",ex:"去大使馆办签证。",ee:"Go to the embassy for a visa."},
+  {c:"大约",p:"dà yuē",pos:"adv",e:"approximately, about",ex:"大约需要一小时。",ee:"It takes approximately one hour."},
+  {c:"大夫",p:"dài fu",pos:"n",e:"doctor",ex:"大夫说要休息。",ee:"The doctor said to rest."},
+  {c:"戴",p:"dài",pos:"v",e:"to wear (glasses, hat, gloves)",ex:"戴上眼镜。",ee:"Put on your glasses."},
+  {c:"当",p:"dāng",pos:"v",e:"to be, to act as; when",ex:"当老师。",ee:"Be a teacher."},
+  {c:"当时",p:"dāng shí",pos:"n",e:"at that time, then",ex:"当时我不知道。",ee:"At that time I didn't know."},
+  {c:"刀",p:"dāo",pos:"n",e:"knife",ex:"一把刀。",ee:"A knife."},
+  {c:"导游",p:"dǎo yóu",pos:"n",e:"tour guide",ex:"导游带我们参观。",ee:"The tour guide showed us around."},
+  {c:"倒",p:"dào",pos:"v",e:"to pour; to move backwards",ex:"倒一杯水。",ee:"Pour a glass of water."},
+  {c:"到处",p:"dào chù",pos:"adv",e:"everywhere, in all places",ex:"到处找他。",ee:"Looking for him everywhere."},
+  {c:"到底",p:"dào dǐ",pos:"adv",e:"after all, in the end, exactly",ex:"你到底去不去？",ee:"Are you going or not in the end?"},
+  {c:"道歉",p:"dào qiàn",pos:"v",e:"to apologize",ex:"向他道歉。",ee:"Apologize to him."},
+  {c:"得",p:"dé",pos:"particle",e:"particle of result/degree; must",ex:"他说得很好。",ee:"He speaks very well."},
+  {c:"得意",p:"dé yì",pos:"adj",e:"proud of oneself, complacent",ex:"他很得意。",ee:"He was very pleased with himself."},
+  {c:"登机牌",p:"dēng jī pái",pos:"n",e:"boarding pass",ex:"出示登机牌。",ee:"Show your boarding pass."},
+  {c:"等",p:"děng",pos:"particle",e:"etc, and so on",ex:"苹果、香蕉等。",ee:"Apples, bananas, etc."},
+  {c:"低",p:"dī",pos:"adj",e:"low",ex:"价格很低。",ee:"The price is very low."},
+  {c:"底",p:"dǐ",pos:"n",e:"bottom, base, end of a period",ex:"月底。",ee:"End of the month."},
+  {c:"地点",p:"dì diǎn",pos:"n",e:"place, location, venue",ex:"见面地点。",ee:"Meeting location."},
+  {c:"地球",p:"dì qiú",pos:"n",e:"the Earth",ex:"保护地球。",ee:"Protect the Earth."},
+  {c:"地址",p:"dì zhǐ",pos:"n",e:"address",ex:"写下地址。",ee:"Write down the address."},
+  {c:"掉",p:"diào",pos:"v",e:"to fall, to drop, to lose",ex:"手机掉了。",ee:"The phone dropped."},
+  {c:"调查",p:"diào chá",pos:"v",e:"to investigate; survey",ex:"进行调查。",ee:"Conduct a survey."},
+  {c:"丢",p:"diū",pos:"v",e:"to lose, to throw",ex:"丢钥匙了。",ee:"Lost the key."},
+  {c:"动作",p:"dòng zuò",pos:"n",e:"movement, action",ex:"动作要标准。",ee:"The movements should be standard."},
+  {c:"堵车",p:"dǔ chē",pos:"v",e:"traffic jam",ex:"路上堵车了。",ee:"There's a traffic jam on the road."},
+  {c:"肚子",p:"dù zi",pos:"n",e:"belly, stomach",ex:"肚子疼。",ee:"My stomach hurts."},
+  {c:"短信",p:"duǎn xìn",pos:"n",e:"text message, SMS",ex:"发短信给我。",ee:"Send me a text."},
+  {c:"对话",p:"duì huà",pos:"n",e:"dialogue, conversation",ex:"进行对话。",ee:"Hold a dialogue."},
+  {c:"对面",p:"duì miàn",pos:"n",e:"opposite side, across",ex:"在对面。",ee:"On the opposite side."},
+  {c:"对于",p:"duì yú",pos:"prep",e:"regarding, as far as",ex:"对于这个问题，我有看法。",ee:"Regarding this issue, I have opinions."},
+  {c:"儿童",p:"ér tóng",pos:"n",e:"child, children",ex:"儿童节快乐！",ee:"Happy Children's Day!"},
+  {c:"而",p:"ér",pos:"conj",e:"and, yet, but",ex:"努力而不放弃。",ee:"Work hard and don't give up."},
+  {c:"发生",p:"fā shēng",pos:"v",e:"to happen, to occur",ex:"发生了什么？",ee:"What happened?"},
+  {c:"发展",p:"fā zhǎn",pos:"v",e:"to develop; development",ex:"快速发展。",ee:"Rapid development."},
+  {c:"法律",p:"fǎ lǜ",pos:"n",e:"law",ex:"遵守法律。",ee:"Obey the law."},
+  {c:"翻译",p:"fān yì",pos:"v",e:"to translate; translator",ex:"请帮我翻译。",ee:"Please help me translate."},
+  {c:"烦恼",p:"fán nǎo",pos:"adj",e:"worried, troubled; worries",ex:"不要烦恼。",ee:"Don't be troubled."},
+  {c:"反对",p:"fǎn duì",pos:"v",e:"to oppose, to object",ex:"我反对这个决定。",ee:"I oppose this decision."},
+  {c:"方法",p:"fāng fǎ",pos:"n",e:"method, way, means",ex:"找到方法。",ee:"Find a method."},
+  {c:"方面",p:"fāng miàn",pos:"n",e:"aspect, respect, side",ex:"各方面都好。",ee:"Good in all aspects."},
+  {c:"方向",p:"fāng xiàng",pos:"n",e:"direction",ex:"向正确的方向走。",ee:"Walk in the right direction."},
+  {c:"房东",p:"fáng dōng",pos:"n",e:"landlord",ex:"房东很好。",ee:"The landlord is very nice."},
+  {c:"放弃",p:"fàng qì",pos:"v",e:"to give up, to abandon",ex:"不要放弃。",ee:"Don't give up."},
+  {c:"放暑假",p:"fàng shǔ jià",pos:"v",e:"to take summer vacation",ex:"快放暑假了。",ee:"Summer vacation is coming soon."},
+  {c:"放松",p:"fàng sōng",pos:"v",e:"to relax, to loosen",ex:"放松一下。",ee:"Relax a little."},
+  {c:"份",p:"fèn",pos:"n",e:"portion, share, copy",ex:"一份报纸。",ee:"A copy of a newspaper."},
+  {c:"丰富",p:"fēng fù",pos:"adj",e:"rich, plentiful, abundant",ex:"内容丰富。",ee:"Rich in content."},
+  {c:"否则",p:"fǒu zé",pos:"conj",e:"otherwise, or else",ex:"快点，否则会迟到。",ee:"Hurry, otherwise you'll be late."},
+  {c:"符合",p:"fú hé",pos:"v",e:"in accordance with, to conform to",ex:"符合要求。",ee:"Meet the requirements."},
+  {c:"付款",p:"fù kuǎn",pos:"v",e:"to pay, payment",ex:"请付款。",ee:"Please make payment."},
+  {c:"复印",p:"fù yìn",pos:"v",e:"to photocopy, to duplicate",ex:"复印文件。",ee:"Photocopy the document."},
+  {c:"复杂",p:"fù zá",pos:"adj",e:"complicated, complex",ex:"情况很复杂。",ee:"The situation is very complex."},
+  {c:"富",p:"fù",pos:"adj",e:"rich, wealthy",ex:"他很富。",ee:"He is very wealthy."},
+  {c:"父亲",p:"fù qīn",pos:"n",e:"father",ex:"我的父亲。",ee:"My father."},
+  {c:"负责",p:"fù zé",pos:"v",e:"to be responsible, to be in charge",ex:"负责这个项目。",ee:"Be responsible for this project."},
+  {c:"改变",p:"gǎi biàn",pos:"v",e:"to change, to alter",ex:"改变想法。",ee:"Change one's mind."},
+  {c:"干杯",p:"gān bēi",pos:"v",e:"to toast, cheers!",ex:"干杯！",ee:"Cheers!"},
+  {c:"感动",p:"gǎn dòng",pos:"v",e:"to be moved, touching",ex:"这个故事很感动人。",ee:"This story is very touching."},
+  {c:"感觉",p:"gǎn jué",pos:"v",e:"to feel; feeling, sense",ex:"感觉很好。",ee:"Feeling great."},
+  {c:"感情",p:"gǎn qíng",pos:"n",e:"emotion, feeling, affection",ex:"感情很深。",ee:"Deep feelings."},
+  {c:"感谢",p:"gǎn xiè",pos:"v",e:"to thank, to be grateful",ex:"非常感谢！",ee:"Thank you very much!"},
+  {c:"敢",p:"gǎn",pos:"v",e:"to dare",ex:"你敢去吗？",ee:"Do you dare to go?"},
+  {c:"赶",p:"gǎn",pos:"v",e:"to hurry, to catch (transport)",ex:"赶公共汽车。",ee:"Catch the bus."},
+  {c:"干",p:"gàn",pos:"v",e:"to do, to work",ex:"干活。",ee:"Do work."},
+  {c:"刚",p:"gāng",pos:"adv",e:"just, just now, only just",ex:"刚到。",ee:"Just arrived."},
+  {c:"高速公路",p:"gāo sù gōng lù",pos:"n",e:"highway, expressway",ex:"走高速公路。",ee:"Take the highway."},
+  {c:"胳膊",p:"gē bo",pos:"n",e:"arm",ex:"胳膊疼。",ee:"My arm hurts."},
+  {c:"各",p:"gè",pos:"pron",e:"each, every, various",ex:"各种颜色。",ee:"Various colours."},
+  {c:"公里",p:"gōng lǐ",pos:"n",e:"kilometre",ex:"跑了十公里。",ee:"Ran ten kilometres."},
+  {c:"功夫",p:"gōng fu",pos:"n",e:"skill, effort, kung fu",ex:"下功夫学习。",ee:"Put in effort to study."},
+  {c:"工资",p:"gōng zī",pos:"n",e:"wages, salary",ex:"这个月工资高。",ee:"This month's salary is high."},
+  {c:"共同",p:"gòng tóng",pos:"adj",e:"common, together, jointly",ex:"共同努力。",ee:"Work together."},
+  {c:"够",p:"gòu",pos:"v",e:"enough, sufficient",ex:"钱够了。",ee:"There is enough money."},
+  {c:"购物",p:"gòu wù",pos:"v",e:"to shop, to go shopping",ex:"去购物中心购物。",ee:"Go shopping at the mall."},
+  {c:"估计",p:"gū jì",pos:"v",e:"to estimate, to reckon",ex:"我估计需要两小时。",ee:"I estimate it will take two hours."},
+  {c:"鼓励",p:"gǔ lì",pos:"v",e:"to encourage",ex:"父母鼓励我学习。",ee:"My parents encourage me to study."},
+  {c:"故意",p:"gù yì",pos:"adv",e:"on purpose, deliberately",ex:"他是故意的。",ee:"He did it on purpose."},
+  {c:"顾客",p:"gù kè",pos:"n",e:"customer, client",ex:"顾客至上。",ee:"The customer comes first."},
+  {c:"挂",p:"guà",pos:"v",e:"to hang, to put up",ex:"挂上画。",ee:"Hang up the painting."},
+  {c:"关键",p:"guān jiàn",pos:"n",e:"key point, crucial, critical",ex:"这是关键问题。",ee:"This is the key issue."},
+  {c:"观众",p:"guān zhòng",pos:"n",e:"audience, spectators",ex:"观众很多。",ee:"There are many audience members."},
+  {c:"管理",p:"guǎn lǐ",pos:"v",e:"to manage; management",ex:"管理公司。",ee:"Manage the company."},
+  {c:"光",p:"guāng",pos:"n",e:"light; only, merely",ex:"光线很好。",ee:"The light is very good."},
+  {c:"广播",p:"guǎng bō",pos:"n",e:"broadcast, radio",ex:"听广播。",ee:"Listen to the radio."},
+  {c:"广告",p:"guǎng gào",pos:"n",e:"advertisement",ex:"电视广告。",ee:"TV advertisement."},
+  {c:"逛",p:"guàng",pos:"v",e:"to stroll, to go window shopping",ex:"逛街。",ee:"Go window shopping."},
+  {c:"规定",p:"guī dìng",pos:"v",e:"to stipulate; regulation, rule",ex:"遵守规定。",ee:"Follow the regulations."},
+  {c:"国籍",p:"guó jí",pos:"n",e:"nationality",ex:"你的国籍是什么？",ee:"What is your nationality?"},
+  {c:"国际",p:"guó jì",pos:"adj",e:"international",ex:"国际会议。",ee:"International conference."},
+  {c:"果汁",p:"guǒ zhī",pos:"n",e:"fruit juice",ex:"喝果汁。",ee:"Drink fruit juice."},
+  {c:"过程",p:"guò chéng",pos:"n",e:"process, course",ex:"学习过程。",ee:"The learning process."},
+  {c:"海洋",p:"hǎi yáng",pos:"n",e:"ocean, sea",ex:"海洋很大。",ee:"The ocean is vast."},
+  {c:"害羞",p:"hài xiū",pos:"adj",e:"shy, bashful",ex:"她很害羞。",ee:"She is very shy."},
+  {c:"寒假",p:"hán jià",pos:"n",e:"winter vacation",ex:"寒假快到了。",ee:"Winter vacation is coming."},
+  {c:"汗",p:"hàn",pos:"n",e:"sweat, perspiration",ex:"出了很多汗。",ee:"Sweated a lot."},
+  {c:"航班",p:"háng bān",pos:"n",e:"scheduled flight",ex:"航班延误了。",ee:"The flight was delayed."},
+  {c:"好处",p:"hǎo chu",pos:"n",e:"benefit, advantage",ex:"运动有好处。",ee:"Exercise has benefits."},
+  {c:"好像",p:"hǎo xiàng",pos:"adv",e:"seem, be like, as if",ex:"好像要下雨了。",ee:"It seems like it's going to rain."},
+  {c:"号码",p:"hào mǎ",pos:"n",e:"number (phone, house, etc.)",ex:"电话号码。",ee:"Phone number."},
+  {c:"合格",p:"hé gé",pos:"adj",e:"qualified, up to standard",ex:"合格的产品。",ee:"Qualified products."},
+  {c:"合适",p:"hé shì",pos:"adj",e:"suitable, fitting",ex:"这很合适。",ee:"This is very suitable."},
+  {c:"盒子",p:"hé zi",pos:"n",e:"box",ex:"一个盒子。",ee:"A box."},
+  {c:"厚",p:"hòu",pos:"adj",e:"thick",ex:"书很厚。",ee:"The book is very thick."},
+  {c:"后悔",p:"hòu huǐ",pos:"v",e:"to regret",ex:"我后悔了。",ee:"I regret it."},
+  {c:"互联网",p:"hù lián wǎng",pos:"n",e:"the internet",ex:"用互联网查资料。",ee:"Use the internet to look up information."},
+  {c:"互相",p:"hù xiāng",pos:"adv",e:"mutually, each other",ex:"互相帮助。",ee:"Help each other."},
+  {c:"护士",p:"hù shi",pos:"n",e:"nurse",ex:"护士很耐心。",ee:"The nurse is very patient."},
+  {c:"怀疑",p:"huái yí",pos:"v",e:"to suspect, to doubt",ex:"我怀疑他说谎了。",ee:"I suspect he lied."},
+  {c:"回忆",p:"huí yì",pos:"v",e:"to recall; memory",ex:"美好的回忆。",ee:"Beautiful memories."},
+  {c:"活动",p:"huó dòng",pos:"n",e:"activity; to move",ex:"参加活动。",ee:"Participate in an activity."},
+  {c:"活泼",p:"huó po",pos:"adj",e:"lively, vivacious",ex:"孩子很活泼。",ee:"The child is very lively."},
+  {c:"火",p:"huǒ",pos:"n",e:"fire; popular",ex:"小心火！",ee:"Watch out for fire!"},
+  {c:"获得",p:"huò dé",pos:"v",e:"to obtain, to gain, to win",ex:"获得奖励。",ee:"Obtain a reward."},
+  {c:"基础",p:"jī chǔ",pos:"n",e:"foundation, basis",ex:"打好基础。",ee:"Build a good foundation."},
+  {c:"激动",p:"jī dòng",pos:"adj",e:"excited, moved",ex:"他很激动。",ee:"He was very excited."},
+  {c:"积极",p:"jī jí",pos:"adj",e:"positive, active, enthusiastic",ex:"积极参与。",ee:"Participate actively."},
+  {c:"积累",p:"jī lěi",pos:"v",e:"to accumulate",ex:"积累经验。",ee:"Accumulate experience."},
+  {c:"即使",p:"jí shǐ",pos:"conj",e:"even if, even though",ex:"即使很难，也要坚持。",ee:"Even if it's difficult, persist."},
+  {c:"及时",p:"jí shí",pos:"adj",e:"timely, in time",ex:"及时处理问题。",ee:"Handle problems in time."},
+  {c:"寄",p:"jì",pos:"v",e:"to mail, to send by post",ex:"寄信给他。",ee:"Mail a letter to him."},
+  {c:"技术",p:"jì shù",pos:"n",e:"technology, technique, skill",ex:"先进技术。",ee:"Advanced technology."},
+  {c:"既然",p:"jì rán",pos:"conj",e:"since, given that",ex:"既然来了，就留下。",ee:"Since you're here, stay."},
+  {c:"继续",p:"jì xù",pos:"v",e:"to continue",ex:"继续努力。",ee:"Continue to work hard."},
+  {c:"计划",p:"jì huà",pos:"n",e:"plan; to plan",ex:"制定计划。",ee:"Make a plan."},
+  {c:"记者",p:"jì zhě",pos:"n",e:"journalist, reporter",ex:"记者采访。",ee:"The journalist interviews."},
+  {c:"加班",p:"jiā bān",pos:"v",e:"to work overtime",ex:"今天要加班。",ee:"I have to work overtime today."},
+  {c:"加油站",p:"jiā yóu zhàn",pos:"n",e:"gas station, petrol station",ex:"去加油站加油。",ee:"Go to the gas station to refuel."},
+  {c:"家具",p:"jiā jù",pos:"n",e:"furniture",ex:"买新家具。",ee:"Buy new furniture."},
+  {c:"假",p:"jiǎ",pos:"adj",e:"fake, false",ex:"假的东西。",ee:"Fake things."},
+  {c:"价格",p:"jià gé",pos:"n",e:"price",ex:"价格太高了。",ee:"The price is too high."},
+  {c:"坚持",p:"jiān chí",pos:"v",e:"to persist, to persevere",ex:"坚持下去。",ee:"Keep going."},
+  {c:"减肥",p:"jiǎn féi",pos:"v",e:"to lose weight, to diet",ex:"她在减肥。",ee:"She is on a diet."},
+  {c:"减少",p:"jiǎn shǎo",pos:"v",e:"to reduce, to decrease",ex:"减少浪费。",ee:"Reduce waste."},
+  {c:"建议",p:"jiàn yì",pos:"v",e:"to suggest; suggestion",ex:"我有个建议。",ee:"I have a suggestion."},
+  {c:"将来",p:"jiāng lái",pos:"n",e:"future",ex:"将来的事情。",ee:"Things in the future."},
+  {c:"奖金",p:"jiǎng jīn",pos:"n",e:"bonus, award money",ex:"发奖金了。",ee:"Bonus was issued."},
+  {c:"降低",p:"jiàng dī",pos:"v",e:"to reduce, to lower",ex:"降低价格。",ee:"Lower the price."},
+  {c:"降落",p:"jiàng luò",pos:"v",e:"to land (aircraft)",ex:"飞机降落了。",ee:"The plane landed."},
+  {c:"交",p:"jiāo",pos:"v",e:"to hand over, to submit",ex:"交作业。",ee:"Hand in homework."},
+  {c:"交流",p:"jiāo liú",pos:"v",e:"to exchange, to communicate",ex:"交流思想。",ee:"Exchange ideas."},
+  {c:"交通",p:"jiāo tōng",pos:"n",e:"traffic, transportation",ex:"交通很方便。",ee:"Transportation is very convenient."},
+  {c:"郊区",p:"jiāo qū",pos:"n",e:"suburb, outskirts",ex:"住在郊区。",ee:"Live in the suburbs."},
+  {c:"骄傲",p:"jiāo ào",pos:"adj",e:"proud, arrogant",ex:"他很骄傲。",ee:"He is very proud."},
+  {c:"饺子",p:"jiǎo zi",pos:"n",e:"dumplings",ex:"包饺子。",ee:"Make dumplings."},
+  {c:"教授",p:"jiào shòu",pos:"n",e:"professor",ex:"他是教授。",ee:"He is a professor."},
+  {c:"教育",p:"jiào yù",pos:"n",e:"education; to educate",ex:"重视教育。",ee:"Attach importance to education."},
+  {c:"接受",p:"jiē shòu",pos:"v",e:"to accept, to receive",ex:"接受挑战。",ee:"Accept the challenge."},
+  {c:"接着",p:"jiē zhe",pos:"adv",e:"next, then, followed by",ex:"接着说。",ee:"Then continue speaking."},
+  {c:"结果",p:"jié guǒ",pos:"n",e:"result, outcome",ex:"最终结果。",ee:"The final result."},
+  {c:"节",p:"jié",pos:"n",e:"festival; section; classifier for lessons",ex:"一节课。",ee:"One lesson."},
+  {c:"节约",p:"jié yuē",pos:"v",e:"to save, to economise",ex:"节约用水。",ee:"Save water."},
+  {c:"解释",p:"jiě shì",pos:"v",e:"to explain",ex:"请解释一下。",ee:"Please explain."},
+  {c:"尽管",p:"jǐn guǎn",pos:"conj",e:"even though, despite",ex:"尽管很难，还是坚持了。",ee:"Even though it was hard, still persisted."},
+  {c:"紧张",p:"jǐn zhāng",pos:"adj",e:"nervous, tense, tight",ex:"考试前很紧张。",ee:"Very nervous before the exam."},
+  {c:"禁止",p:"jìn zhǐ",pos:"v",e:"to prohibit, to ban",ex:"禁止吸烟。",ee:"No smoking."},
+  {c:"进行",p:"jìn xíng",pos:"v",e:"to carry out, to conduct",ex:"进行研究。",ee:"Conduct research."},
+  {c:"京剧",p:"jīng jù",pos:"n",e:"Peking opera",ex:"欣赏京剧。",ee:"Appreciate Peking opera."},
+  {c:"精彩",p:"jīng cǎi",pos:"adj",e:"brilliant, spectacular, wonderful",ex:"表演很精彩。",ee:"The performance was brilliant."},
+  {c:"经济",p:"jīng jì",pos:"n",e:"economy; economical",ex:"经济发展。",ee:"Economic development."},
+  {c:"经历",p:"jīng lì",pos:"v",e:"to experience; experience",ex:"人生经历。",ee:"Life experiences."},
+  {c:"经验",p:"jīng yàn",pos:"n",e:"experience (practical)",ex:"积累经验。",ee:"Accumulate experience."},
+  {c:"景色",p:"jǐng sè",pos:"n",e:"scenery, view",ex:"景色很美。",ee:"The scenery is beautiful."},
+  {c:"警察",p:"jǐng chá",pos:"n",e:"police, police officer",ex:"找警察帮忙。",ee:"Ask the police for help."},
+  {c:"竞争",p:"jìng zhēng",pos:"v",e:"to compete; competition",ex:"市场竞争激烈。",ee:"Market competition is fierce."},
+  {c:"竟然",p:"jìng rán",pos:"adv",e:"unexpectedly, actually",ex:"他竟然来了！",ee:"He actually came!"},
+  {c:"镜子",p:"jìng zi",pos:"n",e:"mirror",ex:"照镜子。",ee:"Look in the mirror."},
+  {c:"究竟",p:"jiū jìng",pos:"adv",e:"actually, in the end, after all",ex:"究竟怎么了？",ee:"What exactly happened?"},
+  {c:"举",p:"jǔ",pos:"v",e:"to lift, to raise",ex:"举手。",ee:"Raise your hand."},
+  {c:"举办",p:"jǔ bàn",pos:"v",e:"to hold (an event), to organise",ex:"举办活动。",ee:"Hold an event."},
+  {c:"举行",p:"jǔ xíng",pos:"v",e:"to hold (a meeting, ceremony)",ex:"举行会议。",ee:"Hold a meeting."},
+  {c:"拒绝",p:"jù jué",pos:"v",e:"to refuse, to reject",ex:"拒绝邀请。",ee:"Refuse the invitation."},
+  {c:"聚会",p:"jù huì",pos:"n",e:"party, gathering",ex:"朋友聚会。",ee:"Friends' gathering."},
+  {c:"距离",p:"jù lí",pos:"n",e:"distance, gap",ex:"距离很远。",ee:"The distance is very far."},
+  {c:"开玩笑",p:"kāi wán xiào",pos:"v",e:"to joke, to jest",ex:"别开玩笑了。",ee:"Stop joking."},
+  {c:"开心",p:"kāi xīn",pos:"adj",e:"happy, joyful",ex:"我很开心。",ee:"I am very happy."},
+  {c:"看法",p:"kàn fǎ",pos:"n",e:"view, opinion",ex:"我的看法是…",ee:"My view is..."},
+  {c:"烤鸭",p:"kǎo yā",pos:"n",e:"roast duck",ex:"北京烤鸭。",ee:"Beijing roast duck."},
+  {c:"考虑",p:"kǎo lǜ",pos:"v",e:"to consider, to think over",ex:"认真考虑。",ee:"Consider carefully."},
+  {c:"棵",p:"kē",pos:"n",e:"classifier for trees and plants",ex:"一棵树。",ee:"A tree."},
+  {c:"科学",p:"kē xué",pos:"n",e:"science; scientific",ex:"科学研究。",ee:"Scientific research."},
+  {c:"咳嗽",p:"ké sou",pos:"v",e:"to cough",ex:"他在咳嗽。",ee:"He is coughing."},
+  {c:"可怜",p:"kě lián",pos:"adj",e:"pitiful, poor",ex:"太可怜了。",ee:"So pitiful."},
+  {c:"可是",p:"kě shì",pos:"conj",e:"but, however",ex:"很好，可是太贵。",ee:"Very good, but too expensive."},
+  {c:"可惜",p:"kě xī",pos:"adj",e:"it's a pity, unfortunately",ex:"真可惜！",ee:"What a pity!"},
+  {c:"客厅",p:"kè tīng",pos:"n",e:"living room, lounge",ex:"坐在客厅。",ee:"Sit in the living room."},
+  {c:"肯定",p:"kěn dìng",pos:"adv",e:"certainly; to affirm",ex:"他肯定来。",ee:"He will certainly come."},
+  {c:"空",p:"kōng",pos:"adj",e:"empty; free time",ex:"有空来玩。",ee:"Come visit when you're free."},
+  {c:"空气",p:"kōng qì",pos:"n",e:"air, atmosphere",ex:"空气很新鲜。",ee:"The air is very fresh."},
+  {c:"恐怕",p:"kǒng pà",pos:"adv",e:"I'm afraid, probably",ex:"恐怕来不了。",ee:"I'm afraid I can't come."},
+  {c:"苦",p:"kǔ",pos:"adj",e:"bitter, hard, suffering",ex:"生活很苦。",ee:"Life is very hard."},
+  {c:"矿泉水",p:"kuàng quán shuǐ",pos:"n",e:"mineral water, spring water",ex:"喝矿泉水。",ee:"Drink mineral water."},
+  {c:"困",p:"kùn",pos:"adj",e:"sleepy, tired",ex:"我很困。",ee:"I'm very sleepy."},
+  {c:"困难",p:"kùn nan",pos:"n",e:"difficulty; difficult",ex:"克服困难。",ee:"Overcome difficulties."},
+  {c:"垃圾桶",p:"lā jī tǒng",pos:"n",e:"rubbish bin, trash can",ex:"扔进垃圾桶。",ee:"Throw it in the bin."},
+  {c:"拉",p:"lā",pos:"v",e:"to pull, to drag",ex:"拉着手。",ee:"Holding hands."},
+  {c:"辣",p:"là",pos:"adj",e:"spicy, hot (food)",ex:"太辣了。",ee:"Too spicy."},
+  {c:"来不及",p:"lái bu jí",pos:"v",e:"there's not enough time, too late",ex:"来不及了。",ee:"There's no time left."},
+  {c:"来得及",p:"lái de jí",pos:"v",e:"there's still time, in time",ex:"还来得及。",ee:"There's still time."},
+  {c:"来自",p:"lái zì",pos:"v",e:"to come from",ex:"我来自中国。",ee:"I come from China."},
+  {c:"懒",p:"lǎn",pos:"adj",e:"lazy",ex:"他很懒。",ee:"He is very lazy."},
+  {c:"浪费",p:"làng fèi",pos:"v",e:"to waste",ex:"不要浪费食物。",ee:"Don't waste food."},
+  {c:"浪漫",p:"làng màn",pos:"adj",e:"romantic",ex:"很浪漫。",ee:"Very romantic."},
+  {c:"老虎",p:"lǎo hǔ",pos:"n",e:"tiger",ex:"老虎很凶。",ee:"Tigers are fierce."},
+  {c:"冷静",p:"lěng jìng",pos:"adj",e:"calm, cool-headed",ex:"保持冷静。",ee:"Stay calm."},
+  {c:"理发",p:"lǐ fà",pos:"v",e:"to get a haircut",ex:"去理发。",ee:"Go get a haircut."},
+  {c:"理解",p:"lǐ jiě",pos:"v",e:"to understand, to comprehend",ex:"理解很重要。",ee:"Understanding is important."},
+  {c:"理想",p:"lǐ xiǎng",pos:"n",e:"ideal, dream; ideal",ex:"实现理想。",ee:"Realise your dreams."},
+  {c:"礼拜天",p:"lǐ bài tiān",pos:"n",e:"Sunday",ex:"礼拜天不上班。",ee:"No work on Sunday."},
+  {c:"礼貌",p:"lǐ mào",pos:"n",e:"manners, etiquette; polite",ex:"要有礼貌。",ee:"Be polite."},
+  {c:"例如",p:"lì rú",pos:"conj",e:"for example, such as",ex:"例如苹果、梨。",ee:"For example, apples and pears."},
+  {c:"力气",p:"lì qi",pos:"n",e:"strength, effort",ex:"花了很大力气。",ee:"Spent a lot of effort."},
+  {c:"厉害",p:"lì hai",pos:"adj",e:"impressive, formidable, serious",ex:"他很厉害。",ee:"He is very impressive."},
+  {c:"俩",p:"liǎ",pos:"num",e:"two (people), both",ex:"我们俩。",ee:"The two of us."},
+  {c:"联系",p:"lián xì",pos:"v",e:"to contact, to link",ex:"保持联系。",ee:"Keep in touch."},
+  {c:"连",p:"lián",pos:"prep",e:"even, including",ex:"连他都不知道。",ee:"Even he doesn't know."},
+  {c:"凉快",p:"liáng kuai",pos:"adj",e:"cool, refreshingly cool",ex:"今天很凉快。",ee:"It's cool today."},
+  {c:"零钱",p:"líng qián",pos:"n",e:"small change, loose change",ex:"找零钱。",ee:"Give change."},
+  {c:"另外",p:"lìng wài",pos:"adv",e:"in addition, besides",ex:"另外还有。",ee:"There is more in addition."},
+  {c:"流利",p:"liú lì",pos:"adj",e:"fluent",ex:"说话流利。",ee:"Speak fluently."},
+  {c:"流行",p:"liú xíng",pos:"adj",e:"popular, fashionable; to spread",ex:"现在很流行。",ee:"Very popular now."},
+  {c:"留",p:"liú",pos:"v",e:"to stay, to keep, to leave behind",ex:"留下来。",ee:"Stay."},
+  {c:"旅行",p:"lǚ xíng",pos:"v",e:"to travel; travel",ex:"去旅行。",ee:"Go travelling."},
+  {c:"乱",p:"luàn",pos:"adj",e:"messy, chaotic, disorderly",ex:"房间很乱。",ee:"The room is very messy."},
+  {c:"律师",p:"lǜ shī",pos:"n",e:"lawyer, attorney",ex:"他是律师。",ee:"He is a lawyer."},
+  {c:"麻烦",p:"má fan",pos:"adj",e:"troublesome; to trouble (someone)",ex:"太麻烦了。",ee:"Too much trouble."},
+  {c:"马虎",p:"mǎ hu",pos:"adj",e:"careless, sloppy",ex:"做事不能马虎。",ee:"You can't be sloppy in what you do."},
+  {c:"满",p:"mǎn",pos:"adj",e:"full, filled",ex:"装满了水。",ee:"Filled with water."},
+  {c:"毛",p:"máo",pos:"n",e:"hair, feather; 0.1 yuan",ex:"一毛钱。",ee:"10 cents (0.1 yuan)."},
+  {c:"毛巾",p:"máo jīn",pos:"n",e:"towel",ex:"用毛巾擦脸。",ee:"Use a towel to wipe your face."},
+  {c:"美丽",p:"měi lì",pos:"adj",e:"beautiful",ex:"美丽的风景。",ee:"Beautiful scenery."},
+  {c:"梦",p:"mèng",pos:"n",e:"dream",ex:"做了一个梦。",ee:"Had a dream."},
+  {c:"迷路",p:"mí lù",pos:"v",e:"to get lost",ex:"迷路了。",ee:"Got lost."},
+  {c:"密码",p:"mì mǎ",pos:"n",e:"password, secret code",ex:"忘了密码。",ee:"Forgot the password."},
+  {c:"免费",p:"miǎn fèi",pos:"adj",e:"free of charge",ex:"免费入场。",ee:"Free admission."},
+  {c:"秒",p:"miǎo",pos:"n",e:"second (time)",ex:"三十秒。",ee:"Thirty seconds."},
+  {c:"民族",p:"mín zú",pos:"n",e:"nationality, ethnic group",ex:"中华民族。",ee:"The Chinese nation."},
+  {c:"母亲",p:"mǔ qīn",pos:"n",e:"mother",ex:"我的母亲。",ee:"My mother."},
+  {c:"目的",p:"mù dì",pos:"n",e:"purpose, aim, goal",ex:"学习的目的。",ee:"The purpose of studying."},
+  {c:"耐心",p:"nài xīn",pos:"adj",e:"patient; patience",ex:"要有耐心。",ee:"Be patient."},
+  {c:"难道",p:"nán dào",pos:"adv",e:"is it possible that, don't tell me",ex:"难道你不知道？",ee:"Don't you know?"},
+  {c:"难受",p:"nán shòu",pos:"adj",e:"feeling bad, uncomfortable, sad",ex:"心里难受。",ee:"Feeling upset inside."},
+  {c:"内",p:"nèi",pos:"prep",e:"inside, within",ex:"三天内完成。",ee:"Complete within three days."},
+  {c:"内容",p:"nèi róng",pos:"n",e:"content, substance",ex:"内容丰富。",ee:"Rich in content."},
+  {c:"能力",p:"néng lì",pos:"n",e:"ability, capability",ex:"提高能力。",ee:"Improve ability."},
+  {c:"年龄",p:"nián líng",pos:"n",e:"age",ex:"不同年龄。",ee:"Different ages."},
+  {c:"弄",p:"nòng",pos:"v",e:"to do, to make, to handle",ex:"弄清楚。",ee:"Sort it out."},
+  {c:"暖和",p:"nuǎn huo",pos:"adj",e:"warm (weather)",ex:"天气暖和。",ee:"The weather is warm."},
+  {c:"偶尔",p:"ǒu ěr",pos:"adv",e:"occasionally, once in a while",ex:"偶尔出去走走。",ee:"Go out for a walk occasionally."},
+  {c:"排队",p:"pái duì",pos:"v",e:"to queue up, to stand in line",ex:"请排队。",ee:"Please queue up."},
+  {c:"排列",p:"pái liè",pos:"v",e:"to arrange, to list in order",ex:"排列整齐。",ee:"Arrange neatly."},
+  {c:"判断",p:"pàn duàn",pos:"v",e:"to judge; judgement",ex:"判断是非。",ee:"Judge right from wrong."},
+  {c:"陪",p:"péi",pos:"v",e:"to accompany, to keep company",ex:"陪他去医院。",ee:"Accompany him to the hospital."},
+  {c:"批评",p:"pī píng",pos:"v",e:"to criticise",ex:"接受批评。",ee:"Accept criticism."},
+  {c:"皮肤",p:"pí fū",pos:"n",e:"skin",ex:"皮肤很好。",ee:"The skin is very good."},
+  {c:"脾气",p:"pí qi",pos:"n",e:"temper, disposition",ex:"他脾气很好。",ee:"He has a great temper."},
+  {c:"篇",p:"piān",pos:"n",e:"classifier for articles, essays",ex:"一篇文章。",ee:"An article."},
+  {c:"骗",p:"piàn",pos:"v",e:"to cheat, to deceive",ex:"被骗了。",ee:"Got cheated."},
+  {c:"乒乓球",p:"pīng pāng qiú",pos:"n",e:"table tennis, ping-pong",ex:"打乒乓球。",ee:"Play table tennis."},
+  {c:"平时",p:"píng shí",pos:"n",e:"at ordinary times, usually",ex:"平时我早起。",ee:"I usually wake up early."},
+  {c:"破",p:"pò",pos:"adj",e:"broken, worn; to break",ex:"杯子破了。",ee:"The cup broke."},
+  {c:"葡萄",p:"pú tao",pos:"n",e:"grape",ex:"吃葡萄。",ee:"Eat grapes."},
+  {c:"普遍",p:"pǔ biàn",pos:"adj",e:"universal, common, widespread",ex:"这是普遍现象。",ee:"This is a common phenomenon."},
+  {c:"普通话",p:"pǔ tōng huà",pos:"n",e:"Mandarin Chinese",ex:"说普通话。",ee:"Speak Mandarin."},
+  {c:"其次",p:"qí cì",pos:"adv",e:"next, secondly",ex:"其次，要注意…",ee:"Next, you should pay attention to..."},
+  {c:"其中",p:"qí zhōng",pos:"prep",e:"among, in, within",ex:"其中一个。",ee:"One among them."},
+  {c:"气候",p:"qì hòu",pos:"n",e:"climate",ex:"气候变化。",ee:"Climate change."},
+  {c:"千万",p:"qiān wàn",pos:"adv",e:"by all means, absolutely must not",ex:"千万别迟到。",ee:"Whatever you do, don't be late."},
+  {c:"签证",p:"qiān zhèng",pos:"n",e:"visa",ex:"申请签证。",ee:"Apply for a visa."},
+  {c:"敲",p:"qiāo",pos:"v",e:"to knock, to tap",ex:"敲门。",ee:"Knock on the door."},
+  {c:"桥",p:"qiáo",pos:"n",e:"bridge",ex:"过桥。",ee:"Cross the bridge."},
+  {c:"巧克力",p:"qiǎo kè lì",pos:"n",e:"chocolate",ex:"吃巧克力。",ee:"Eat chocolate."},
+  {c:"亲戚",p:"qīn qi",pos:"n",e:"relative, family relation",ex:"亲戚来了。",ee:"Relatives came."},
+  {c:"轻",p:"qīng",pos:"adj",e:"light (weight), gentle",ex:"很轻。",ee:"Very light."},
+  {c:"轻松",p:"qīng sōng",pos:"adj",e:"relaxed, easy, effortless",ex:"心情轻松。",ee:"Feeling relaxed."},
+  {c:"情况",p:"qíng kuàng",pos:"n",e:"situation, condition",ex:"了解情况。",ee:"Understand the situation."},
+  {c:"穷",p:"qióng",pos:"adj",e:"poor, poverty-stricken",ex:"家里很穷。",ee:"The family is very poor."},
+  {c:"区别",p:"qū bié",pos:"n",e:"difference; to distinguish",ex:"有什么区别？",ee:"What's the difference?"},
+  {c:"取",p:"qǔ",pos:"v",e:"to take, to fetch, to collect",ex:"去取快递。",ee:"Go pick up the delivery."},
+  {c:"全部",p:"quán bù",pos:"adj",e:"all, entire, complete",ex:"全部完成了。",ee:"All done."},
+  {c:"缺点",p:"quē diǎn",pos:"n",e:"shortcoming, weakness, defect",ex:"认识到缺点。",ee:"Recognise one's weaknesses."},
+  {c:"缺少",p:"quē shǎo",pos:"v",e:"to lack, to be short of",ex:"缺少经验。",ee:"Lack experience."},
+  {c:"却",p:"què",pos:"conj",e:"but, yet, however",ex:"努力了，却失败了。",ee:"Worked hard, but failed."},
+  {c:"确实",p:"què shí",pos:"adv",e:"indeed, really, certainly",ex:"确实如此。",ee:"That is indeed the case."},
+  {c:"然而",p:"rán ér",pos:"conj",e:"however, but, yet",ex:"他努力了，然而失败了。",ee:"He worked hard, however he failed."},
+  {c:"热闹",p:"rè nao",pos:"adj",e:"lively, bustling, busy",ex:"街上很热闹。",ee:"The street is very lively."},
+  {c:"任何",p:"rèn hé",pos:"pron",e:"any, whatever",ex:"任何时候都行。",ee:"Any time is fine."},
+  {c:"任务",p:"rèn wu",pos:"n",e:"task, mission",ex:"完成任务。",ee:"Complete the task."},
+  {c:"扔",p:"rēng",pos:"v",e:"to throw, to toss",ex:"扔球。",ee:"Throw the ball."},
+  {c:"仍然",p:"réng rán",pos:"adv",e:"still, yet, as before",ex:"仍然很好。",ee:"Still very good."},
+  {c:"日记",p:"rì jì",pos:"n",e:"diary",ex:"写日记。",ee:"Write a diary."},
+  {c:"入口",p:"rù kǒu",pos:"n",e:"entrance, entry",ex:"从入口进去。",ee:"Enter through the entrance."},
+  {c:"散步",p:"sàn bù",pos:"v",e:"to take a walk",ex:"饭后散步。",ee:"Take a walk after dinner."},
+  {c:"森林",p:"sēn lín",pos:"n",e:"forest, woods",ex:"森林很大。",ee:"The forest is vast."},
+  {c:"沙发",p:"shā fā",pos:"n",e:"sofa, couch",ex:"坐沙发。",ee:"Sit on the sofa."},
+  {c:"伤心",p:"shāng xīn",pos:"adj",e:"sad, heartbroken",ex:"她很伤心。",ee:"She is very sad."},
+  {c:"商量",p:"shāng liang",pos:"v",e:"to discuss, to talk over",ex:"我们商量一下。",ee:"Let's talk it over."},
+  {c:"稍微",p:"shāo wēi",pos:"adv",e:"a little, slightly",ex:"稍微好一点。",ee:"A little better."},
+  {c:"勺子",p:"sháo zi",pos:"n",e:"spoon, ladle",ex:"用勺子吃饭。",ee:"Eat with a spoon."},
+  {c:"社会",p:"shè huì",pos:"n",e:"society",ex:"社会责任。",ee:"Social responsibility."},
+  {c:"深",p:"shēn",pos:"adj",e:"deep, profound",ex:"水很深。",ee:"The water is very deep."},
+  {c:"申请",p:"shēn qǐng",pos:"v",e:"to apply (for), to request",ex:"申请工作。",ee:"Apply for a job."},
+  {c:"甚至",p:"shèn zhì",pos:"adv",e:"even, so much so that",ex:"甚至连书都没有。",ee:"They don't even have books."},
+  {c:"生活",p:"shēng huó",pos:"n",e:"life, lifestyle; to live",ex:"生活很好。",ee:"Life is good."},
+  {c:"生命",p:"shēng mìng",pos:"n",e:"life (biological), living being",ex:"珍惜生命。",ee:"Cherish life."},
+  {c:"生意",p:"shēng yì",pos:"n",e:"business, trade",ex:"做生意。",ee:"Do business."},
+  {c:"省",p:"shěng",pos:"v",e:"to save, to economise",ex:"省时间。",ee:"Save time."},
+  {c:"剩",p:"shèng",pos:"v",e:"to remain, to be left over",ex:"还剩多少？",ee:"How much is left?"},
+  {c:"失败",p:"shī bài",pos:"v",e:"to fail, to be defeated",ex:"失败了不要放弃。",ee:"Don't give up after failing."},
+  {c:"失望",p:"shī wàng",pos:"adj",e:"disappointed, disillusioned",ex:"他很失望。",ee:"He is very disappointed."},
+  {c:"师傅",p:"shī fu",pos:"n",e:"master, skilled worker",ex:"师傅你好。",ee:"Hello, master/sir."},
+  {c:"十分",p:"shí fēn",pos:"adv",e:"very, extremely, fully",ex:"十分感谢。",ee:"Extremely grateful."},
+  {c:"实际",p:"shí jì",pos:"adj",e:"practical, real, actual",ex:"实际情况。",ee:"The actual situation."},
+  {c:"实在",p:"shí zài",pos:"adv",e:"really, honestly, truly",ex:"实在没办法。",ee:"Really no way."},
+  {c:"使",p:"shǐ",pos:"v",e:"to make, to cause, to use",ex:"使他高兴。",ee:"Make him happy."},
+  {c:"使用",p:"shǐ yòng",pos:"v",e:"to use, to employ",ex:"使用新方法。",ee:"Use new methods."},
+  {c:"世纪",p:"shì jì",pos:"n",e:"century",ex:"二十一世纪。",ee:"The 21st century."},
+  {c:"是否",p:"shì fǒu",pos:"adv",e:"whether or not",ex:"不知是否正确。",ee:"Not sure whether it's correct."},
+  {c:"适合",p:"shì hé",pos:"v",e:"to suit, to fit, to be appropriate",ex:"适合你。",ee:"Suits you."},
+  {c:"适应",p:"shì yìng",pos:"v",e:"to adapt, to adjust to",ex:"适应新环境。",ee:"Adapt to a new environment."},
+  {c:"收",p:"shōu",pos:"v",e:"to receive, to accept, to collect",ex:"收到信了。",ee:"Received the letter."},
+  {c:"收入",p:"shōu rù",pos:"n",e:"income, revenue",ex:"月收入。",ee:"Monthly income."},
+  {c:"收拾",p:"shōu shi",pos:"v",e:"to tidy up, to pack",ex:"收拾行李。",ee:"Pack your luggage."},
+  {c:"首都",p:"shǒu dū",pos:"n",e:"capital city",ex:"北京是首都。",ee:"Beijing is the capital."},
+  {c:"首先",p:"shǒu xiān",pos:"adv",e:"first of all, firstly",ex:"首先，我想说…",ee:"First of all, I want to say..."},
+  {c:"受不了",p:"shòu bù liǎo",pos:"v",e:"cannot stand it, unbearable",ex:"太热，受不了。",ee:"Too hot, can't stand it."},
+  {c:"受到",p:"shòu dào",pos:"v",e:"to receive, to be subject to",ex:"受到鼓励。",ee:"Receive encouragement."},
+  {c:"售货员",p:"shòu huò yuán",pos:"n",e:"shop assistant, salesperson",ex:"售货员很热情。",ee:"The shop assistant is very enthusiastic."},
+  {c:"输",p:"shū",pos:"v",e:"to lose (a contest)",ex:"比赛输了。",ee:"Lost the match."},
+  {c:"熟悉",p:"shú xī",pos:"v",e:"to be familiar with; familiar",ex:"很熟悉这里。",ee:"Very familiar with here."},
+  {c:"数量",p:"shù liàng",pos:"n",e:"quantity, amount",ex:"数量不够。",ee:"The quantity is not enough."},
+  {c:"数字",p:"shù zì",pos:"n",e:"numeral, digit, figure",ex:"写出数字。",ee:"Write out the numerals."},
+  {c:"帅",p:"shuài",pos:"adj",e:"handsome, smart-looking",ex:"他很帅。",ee:"He is very handsome."},
+  {c:"顺便",p:"shùn biàn",pos:"adv",e:"conveniently, while you're at it",ex:"顺便帮我买一下。",ee:"Buy it for me while you're at it."},
+  {c:"顺利",p:"shùn lì",pos:"adj",e:"smooth, successful",ex:"顺利完成。",ee:"Complete smoothly."},
+  {c:"顺序",p:"shùn xù",pos:"n",e:"order, sequence",ex:"按顺序来。",ee:"Come in order."},
+  {c:"说明",p:"shuō míng",pos:"v",e:"to explain; explanation",ex:"请说明原因。",ee:"Please explain the reason."},
+  {c:"硕士",p:"shuò shì",pos:"n",e:"master's degree",ex:"读硕士。",ee:"Study for a master's degree."},
+  {c:"死",p:"sǐ",pos:"v",e:"to die; (intensifier) to death",ex:"累死了。",ee:"Dead tired."},
+  {c:"塑料袋",p:"sù liào dài",pos:"n",e:"plastic bag",ex:"用塑料袋装东西。",ee:"Use a plastic bag."},
+  {c:"速度",p:"sù dù",pos:"n",e:"speed, velocity",ex:"速度很快。",ee:"The speed is very fast."},
+  {c:"酸",p:"suān",pos:"adj",e:"sour, tart",ex:"这个很酸。",ee:"This is very sour."},
+  {c:"随便",p:"suí biàn",pos:"adj",e:"casual, do as you please",ex:"随便坐。",ee:"Sit wherever you like."},
+  {c:"随着",p:"suí zhe",pos:"prep",e:"along with, as, following",ex:"随着时间发展。",ee:"As time progresses."},
+  {c:"孙子",p:"sūn zi",pos:"n",e:"grandson",ex:"我的孙子。",ee:"My grandson."},
+  {c:"所有",p:"suǒ yǒu",pos:"adj",e:"all, every",ex:"所有的人。",ee:"All the people."},
+  {c:"台",p:"tái",pos:"n",e:"platform; classifier for machines",ex:"一台电脑。",ee:"A computer."},
+  {c:"抬",p:"tái",pos:"v",e:"to lift, to raise",ex:"抬头看。",ee:"Lift your head and look."},
+  {c:"态度",p:"tài du",pos:"n",e:"attitude",ex:"学习态度。",ee:"Attitude towards studying."},
+  {c:"弹钢琴",p:"tán gāng qín",pos:"v",e:"to play the piano",ex:"她会弹钢琴。",ee:"She can play the piano."},
+  {c:"谈",p:"tán",pos:"v",e:"to talk, to discuss",ex:"我们谈一谈。",ee:"Let's have a talk."},
+  {c:"汤",p:"tāng",pos:"n",e:"soup, broth",ex:"喝汤。",ee:"Drink soup."},
+  {c:"糖",p:"táng",pos:"n",e:"sugar, sweets, candy",ex:"不吃糖。",ee:"Don't eat sweets."},
+  {c:"躺",p:"tǎng",pos:"v",e:"to lie down",ex:"躺下来休息。",ee:"Lie down and rest."},
+  {c:"趟",p:"tàng",pos:"n",e:"classifier for trips/journeys",ex:"去了一趟。",ee:"Made a trip there."},
+  {c:"讨论",p:"tǎo lùn",pos:"v",e:"to discuss",ex:"讨论问题。",ee:"Discuss the problem."},
+  {c:"讨厌",p:"tǎo yàn",pos:"v",e:"to dislike, to hate; disgusting",ex:"真讨厌！",ee:"How annoying!"},
+  {c:"特点",p:"tè diǎn",pos:"n",e:"characteristic, feature, trait",ex:"文化特点。",ee:"Cultural characteristics."},
+  {c:"提",p:"tí",pos:"v",e:"to carry, to raise, to mention",ex:"提一个问题。",ee:"Raise a question."},
+  {c:"提供",p:"tí gōng",pos:"v",e:"to provide, to supply",ex:"提供帮助。",ee:"Provide help."},
+  {c:"提前",p:"tí qián",pos:"v",e:"to move up (time), ahead of schedule",ex:"提前完成。",ee:"Finish ahead of schedule."},
+  {c:"提醒",p:"tí xǐng",pos:"v",e:"to remind",ex:"提醒我一下。",ee:"Give me a reminder."},
+  {c:"填空",p:"tián kòng",pos:"v",e:"to fill in the blanks",ex:"请填空。",ee:"Please fill in the blanks."},
+  {c:"条件",p:"tiáo jiàn",pos:"n",e:"condition, requirement",ex:"满足条件。",ee:"Meet the conditions."},
+  {c:"停",p:"tíng",pos:"v",e:"to stop, to halt, to park",ex:"停车。",ee:"Park the car."},
+  {c:"挺",p:"tǐng",pos:"adv",e:"quite, rather, very",ex:"挺好的。",ee:"Quite good."},
+  {c:"通过",p:"tōng guò",pos:"v",e:"through, by means of; to pass",ex:"通过考试。",ee:"Pass the exam."},
+  {c:"通知",p:"tōng zhī",pos:"v",e:"to notify; notice",ex:"收到通知。",ee:"Received the notice."},
+  {c:"同情",p:"tóng qíng",pos:"v",e:"to sympathise; sympathy",ex:"表示同情。",ee:"Express sympathy."},
+  {c:"同时",p:"tóng shí",pos:"adv",e:"at the same time, simultaneously",ex:"同时进行。",ee:"Proceed simultaneously."},
+  {c:"推",p:"tuī",pos:"v",e:"to push, to shove",ex:"推开门。",ee:"Push open the door."},
+  {c:"推迟",p:"tuī chí",pos:"v",e:"to postpone, to delay",ex:"会议推迟了。",ee:"The meeting was postponed."},
+  {c:"脱",p:"tuō",pos:"v",e:"to take off (clothes), to escape",ex:"脱衣服。",ee:"Take off clothes."},
+  {c:"袜子",p:"wà zi",pos:"n",e:"socks, stockings",ex:"穿袜子。",ee:"Put on socks."},
+  {c:"完全",p:"wán quán",pos:"adv",e:"completely, entirely; complete",ex:"完全正确。",ee:"Completely correct."},
+  {c:"往往",p:"wǎng wǎng",pos:"adv",e:"often, frequently, more often than not",ex:"往往如此。",ee:"This is often the case."},
+  {c:"网球",p:"wǎng qiú",pos:"n",e:"tennis",ex:"打网球。",ee:"Play tennis."},
+  {c:"网站",p:"wǎng zhàn",pos:"n",e:"website",ex:"访问网站。",ee:"Visit the website."},
+  {c:"危险",p:"wēi xiǎn",pos:"adj",e:"dangerous; danger",ex:"很危险。",ee:"Very dangerous."},
+  {c:"卫生间",p:"wèi shēng jiān",pos:"n",e:"bathroom, washroom, toilet",ex:"卫生间在哪？",ee:"Where is the bathroom?"},
+  {c:"味道",p:"wèi dào",pos:"n",e:"taste, flavour, smell",ex:"味道很好。",ee:"It tastes very good."},
+  {c:"温度",p:"wēn dù",pos:"n",e:"temperature",ex:"温度很高。",ee:"The temperature is very high."},
+  {c:"文章",p:"wén zhāng",pos:"n",e:"article, essay, piece of writing",ex:"写文章。",ee:"Write an article."},
+  {c:"污染",p:"wū rǎn",pos:"v",e:"to pollute; pollution",ex:"环境污染。",ee:"Environmental pollution."},
+  {c:"无",p:"wú",pos:"v",e:"to not have, lacking (literary)",ex:"无法解决。",ee:"Unable to solve."},
+  {c:"无聊",p:"wú liáo",pos:"adj",e:"boring, bored, tedious",ex:"太无聊了。",ee:"So boring."},
+  {c:"无论",p:"wú lùn",pos:"conj",e:"no matter, regardless of",ex:"无论如何。",ee:"No matter what."},
+  {c:"误会",p:"wù huì",pos:"v",e:"to misunderstand; misunderstanding",ex:"有误会。",ee:"There is a misunderstanding."},
+  {c:"吸引",p:"xī yǐn",pos:"v",e:"to attract",ex:"吸引注意力。",ee:"Attract attention."},
+  {c:"西红柿",p:"xī hóng shì",pos:"n",e:"tomato",ex:"西红柿炒鸡蛋。",ee:"Tomatoes with scrambled eggs."},
+  {c:"咸",p:"xián",pos:"adj",e:"salty",ex:"太咸了。",ee:"Too salty."},
+  {c:"现金",p:"xiàn jīn",pos:"n",e:"cash",ex:"付现金。",ee:"Pay cash."},
+  {c:"羡慕",p:"xiàn mù",pos:"v",e:"to envy, to admire",ex:"很羡慕你。",ee:"I really envy you."},
+  {c:"相反",p:"xiāng fǎn",pos:"adj",e:"opposite, contrary",ex:"结果相反。",ee:"The result is the opposite."},
+  {c:"相同",p:"xiāng tóng",pos:"adj",e:"same, identical",ex:"我们的想法相同。",ee:"Our thoughts are the same."},
+  {c:"香",p:"xiāng",pos:"adj",e:"fragrant, delicious-smelling",ex:"好香啊！",ee:"Smells so good!"},
+  {c:"详细",p:"xiáng xì",pos:"adj",e:"detailed, thorough",ex:"详细说明。",ee:"Explain in detail."},
+  {c:"响",p:"xiǎng",pos:"v",e:"to make a sound; loud",ex:"声音很响。",ee:"The sound is very loud."},
+  {c:"橡皮",p:"xiàng pí",pos:"n",e:"rubber eraser",ex:"用橡皮擦掉。",ee:"Erase it with a rubber."},
+  {c:"消息",p:"xiāo xi",pos:"n",e:"news, information, message",ex:"好消息！",ee:"Good news!"},
+  {c:"小吃",p:"xiǎo chī",pos:"n",e:"snack, street food, small dish",ex:"各种小吃。",ee:"Various snacks."},
+  {c:"小伙子",p:"xiǎo huǒ zi",pos:"n",e:"young man, lad",ex:"这个小伙子不错。",ee:"This young man is great."},
+  {c:"小说",p:"xiǎo shuō",pos:"n",e:"novel, fiction",ex:"读小说。",ee:"Read a novel."},
+  {c:"效果",p:"xiào guǒ",pos:"n",e:"effect, result",ex:"效果很好。",ee:"The effect is very good."},
+  {c:"笑话",p:"xiào huà",pos:"n",e:"joke",ex:"讲个笑话。",ee:"Tell a joke."},
+  {c:"心情",p:"xīn qíng",pos:"n",e:"mood, state of mind",ex:"心情很好。",ee:"In a great mood."},
+  {c:"辛苦",p:"xīn kǔ",pos:"adj",e:"hard, toilsome, to work hard",ex:"你辛苦了。",ee:"You've worked hard."},
+  {c:"信封",p:"xìn fēng",pos:"n",e:"envelope",ex:"放进信封。",ee:"Put it in an envelope."},
+  {c:"信息",p:"xìn xī",pos:"n",e:"information, news, message",ex:"收到信息。",ee:"Received the message."},
+  {c:"信心",p:"xìn xīn",pos:"n",e:"confidence, faith",ex:"有信心。",ee:"Have confidence."},
+  {c:"兴奋",p:"xīng fèn",pos:"adj",e:"excited, thrilled",ex:"他很兴奋。",ee:"He is very excited."},
+  {c:"行",p:"xíng",pos:"adj",e:"OK, all right; to walk, to travel",ex:"行，没问题。",ee:"OK, no problem."},
+  {c:"醒",p:"xǐng",pos:"v",e:"to wake up, to be awake",ex:"他醒了。",ee:"He woke up."},
+  {c:"幸福",p:"xìng fú",pos:"n",e:"happiness; happy",ex:"追求幸福。",ee:"Pursue happiness."},
+  {c:"性别",p:"xìng bié",pos:"n",e:"gender, sex",ex:"填写性别。",ee:"Fill in gender."},
+  {c:"性格",p:"xìng gé",pos:"n",e:"personality, character, temperament",ex:"性格开朗。",ee:"Cheerful personality."},
+  {c:"修理",p:"xiū lǐ",pos:"v",e:"to repair, to fix",ex:"修理自行车。",ee:"Repair the bicycle."},
+  {c:"许多",p:"xǔ duō",pos:"adj",e:"many, much, a lot of",ex:"许多人。",ee:"Many people."},
+  {c:"学期",p:"xué qī",pos:"n",e:"semester, school term",ex:"这学期。",ee:"This semester."},
+  {c:"呀",p:"ya",pos:"particle",e:"particle indicating surprise or softening",ex:"真漂亮呀！",ee:"How beautiful!"},
+  {c:"压力",p:"yā lì",pos:"n",e:"pressure, stress",ex:"工作压力大。",ee:"Work pressure is high."},
+  {c:"牙膏",p:"yá gāo",pos:"n",e:"toothpaste",ex:"用牙膏刷牙。",ee:"Brush teeth with toothpaste."},
+  {c:"亚洲",p:"yà zhōu",pos:"n",e:"Asia",ex:"亚洲国家。",ee:"Asian countries."},
+  {c:"严格",p:"yán gé",pos:"adj",e:"strict, rigorous",ex:"严格要求。",ee:"Strict requirements."},
+  {c:"严重",p:"yán zhòng",pos:"adj",e:"serious, severe",ex:"严重问题。",ee:"A serious problem."},
+  {c:"盐",p:"yán",pos:"n",e:"salt",ex:"加点盐。",ee:"Add some salt."},
+  {c:"研究",p:"yán jiū",pos:"v",e:"to research; research",ex:"做研究。",ee:"Do research."},
+  {c:"演出",p:"yǎn chū",pos:"v",e:"to perform; performance, show",ex:"精彩的演出。",ee:"A wonderful performance."},
+  {c:"演员",p:"yǎn yuán",pos:"n",e:"actor, actress, performer",ex:"著名演员。",ee:"A famous actor."},
+  {c:"眼镜",p:"yǎn jìng",pos:"n",e:"glasses, spectacles",ex:"戴眼镜。",ee:"Wear glasses."},
+  {c:"阳光",p:"yáng guāng",pos:"n",e:"sunshine, sunlight",ex:"阳光明媚。",ee:"The sunshine is bright."},
+  {c:"养成",p:"yǎng chéng",pos:"v",e:"to form (a habit), to cultivate",ex:"养成好习惯。",ee:"Form good habits."},
+  {c:"样子",p:"yàng zi",pos:"n",e:"appearance, manner, way",ex:"什么样子？",ee:"What does it look like?"},
+  {c:"邀请",p:"yāo qǐng",pos:"v",e:"to invite",ex:"邀请你来。",ee:"Invite you to come."},
+  {c:"要是",p:"yào shi",pos:"conj",e:"if, in case",ex:"要是你来了就好了。",ee:"If only you had come."},
+  {c:"钥匙",p:"yào shi",pos:"n",e:"key (for lock)",ex:"找到钥匙了。",ee:"Found the key."},
+  {c:"也许",p:"yě xǔ",pos:"adv",e:"perhaps, maybe",ex:"也许会下雨。",ee:"Maybe it will rain."},
+  {c:"叶子",p:"yè zi",pos:"n",e:"leaf",ex:"树叶子。",ee:"Tree leaves."},
+  {c:"页",p:"yè",pos:"n",e:"page",ex:"第十页。",ee:"Page ten."},
+  {c:"一切",p:"yī qiè",pos:"pron",e:"everything, all",ex:"一切都好。",ee:"Everything is fine."},
+  {c:"以",p:"yǐ",pos:"prep",e:"by means of, with, because of",ex:"以此为例。",ee:"Take this as an example."},
+  {c:"以为",p:"yǐ wéi",pos:"v",e:"to think (mistakenly), to believe",ex:"我以为你不来了。",ee:"I thought you weren't coming."},
+  {c:"意见",p:"yì jiàn",pos:"n",e:"opinion, view, suggestion",ex:"提出意见。",ee:"Raise an opinion."},
+  {c:"艺术",p:"yì shù",pos:"n",e:"art",ex:"热爱艺术。",ee:"Love art."},
+  {c:"因此",p:"yīn cǐ",pos:"conj",e:"therefore, as a result, thus",ex:"因此很重要。",ee:"Therefore it's very important."},
+  {c:"引起",p:"yǐn qǐ",pos:"v",e:"to cause, to arouse, to trigger",ex:"引起注意。",ee:"Arouse attention."},
+  {c:"印象",p:"yìn xiàng",pos:"n",e:"impression",ex:"留下好印象。",ee:"Leave a good impression."},
+  {c:"赢",p:"yíng",pos:"v",e:"to win",ex:"比赛赢了。",ee:"Won the match."},
+  {c:"应聘",p:"yìng pìn",pos:"v",e:"to apply for a job",ex:"去应聘。",ee:"Go and apply for the job."},
+  {c:"勇敢",p:"yǒng gǎn",pos:"adj",e:"brave, courageous",ex:"他很勇敢。",ee:"He is very brave."},
+  {c:"永远",p:"yǒng yuǎn",pos:"adv",e:"forever, permanently, always",ex:"永远记住。",ee:"Remember forever."},
+  {c:"优点",p:"yōu diǎn",pos:"n",e:"strong point, advantage, merit",ex:"发挥优点。",ee:"Bring out one's strengths."},
+  {c:"优秀",p:"yōu xiù",pos:"adj",e:"excellent, outstanding",ex:"优秀的学生。",ee:"An excellent student."},
+  {c:"幽默",p:"yōu mò",pos:"adj",e:"humorous, funny",ex:"他很幽默。",ee:"He is very humorous."},
+  {c:"尤其",p:"yóu qí",pos:"adv",e:"especially, particularly",ex:"尤其是这个。",ee:"Especially this one."},
+  {c:"由",p:"yóu",pos:"prep",e:"from, by, due to",ex:"由他负责。",ee:"It's up to him."},
+  {c:"由于",p:"yóu yú",pos:"prep",e:"because of, due to",ex:"由于天气原因。",ee:"Due to weather reasons."},
+  {c:"邮局",p:"yóu jú",pos:"n",e:"post office",ex:"去邮局寄信。",ee:"Go to the post office to mail a letter."},
+  {c:"友好",p:"yǒu hǎo",pos:"adj",e:"friendly",ex:"友好合作。",ee:"Friendly cooperation."},
+  {c:"友谊",p:"yǒu yì",pos:"n",e:"friendship",ex:"深厚的友谊。",ee:"Deep friendship."},
+  {c:"有趣",p:"yǒu qù",pos:"adj",e:"interesting, fascinating",ex:"很有趣。",ee:"Very interesting."},
+  {c:"于是",p:"yú shì",pos:"conj",e:"so, therefore, as a result",ex:"于是他离开了。",ee:"So he left."},
+  {c:"愉快",p:"yú kuài",pos:"adj",e:"happy, joyful, cheerful",ex:"愉快的旅行。",ee:"A cheerful trip."},
+  {c:"与",p:"yǔ",pos:"conj",e:"and, with, to",ex:"与你同行。",ee:"Travel with you."},
+  {c:"羽毛球",p:"yǔ máo qiú",pos:"n",e:"badminton",ex:"打羽毛球。",ee:"Play badminton."},
+  {c:"语法",p:"yǔ fǎ",pos:"n",e:"grammar",ex:"学语法。",ee:"Study grammar."},
+  {c:"语言",p:"yǔ yán",pos:"n",e:"language",ex:"学语言。",ee:"Learn a language."},
+  {c:"预习",p:"yù xí",pos:"v",e:"to prepare lessons in advance",ex:"预习课文。",ee:"Preview the lesson."},
+  {c:"原来",p:"yuán lái",pos:"adv",e:"originally; so it turns out",ex:"原来是你！",ee:"So it's you!"},
+  {c:"原谅",p:"yuán liàng",pos:"v",e:"to forgive, to pardon",ex:"请原谅我。",ee:"Please forgive me."},
+  {c:"原因",p:"yuán yīn",pos:"n",e:"reason, cause",ex:"原因很简单。",ee:"The reason is simple."},
+  {c:"约会",p:"yuē huì",pos:"n",e:"date, appointment",ex:"有约会。",ee:"Have a date."},
+  {c:"阅读",p:"yuè dú",pos:"v",e:"to read",ex:"阅读理解。",ee:"Reading comprehension."},
+  {c:"云",p:"yún",pos:"n",e:"cloud",ex:"天上的云。",ee:"Clouds in the sky."},
+  {c:"允许",p:"yǔn xǔ",pos:"v",e:"to permit, to allow",ex:"允许进入。",ee:"Permitted to enter."},
+  {c:"杂志",p:"zá zhì",pos:"n",e:"magazine",ex:"看杂志。",ee:"Read a magazine."},
+  {c:"咱们",p:"zán men",pos:"pron",e:"we (inclusive), us",ex:"咱们走吧。",ee:"Let's go."},
+  {c:"暂时",p:"zàn shí",pos:"adv",e:"temporarily, for the time being",ex:"暂时不行。",ee:"Not possible for now."},
+  {c:"脏",p:"zāng",pos:"adj",e:"dirty, filthy",ex:"衣服脏了。",ee:"The clothes are dirty."},
+  {c:"责任",p:"zé rèn",pos:"n",e:"responsibility, duty",ex:"承担责任。",ee:"Bear responsibility."},
+  {c:"增加",p:"zēng jiā",pos:"v",e:"to increase, to add",ex:"增加信心。",ee:"Increase confidence."},
+  {c:"占线",p:"zhàn xiàn",pos:"v",e:"(phone) busy, engaged",ex:"电话占线。",ee:"The line is busy."},
+  {c:"招聘",p:"zhāo pìn",pos:"v",e:"to recruit, to hire",ex:"招聘新员工。",ee:"Recruit new employees."},
+  {c:"照",p:"zhào",pos:"v",e:"to take (a photo), to shine",ex:"照相。",ee:"Take a photo."},
+  {c:"真正",p:"zhēn zhèng",pos:"adj",e:"genuine, real, truly",ex:"真正的朋友。",ee:"A true friend."},
+  {c:"整理",p:"zhěng lǐ",pos:"v",e:"to tidy, to sort out, to organise",ex:"整理房间。",ee:"Tidy up the room."},
+  {c:"正常",p:"zhèng cháng",pos:"adj",e:"normal, regular",ex:"很正常。",ee:"Very normal."},
+  {c:"正好",p:"zhèng hǎo",pos:"adv",e:"just right, exactly",ex:"来得正好。",ee:"Came at just the right time."},
+  {c:"正确",p:"zhèng què",pos:"adj",e:"correct, right",ex:"答案正确。",ee:"The answer is correct."},
+  {c:"正式",p:"zhèng shì",pos:"adj",e:"formal, official",ex:"正式场合。",ee:"Formal occasion."},
+  {c:"证明",p:"zhèng míng",pos:"v",e:"to prove; proof, certificate",ex:"证明身份。",ee:"Prove one's identity."},
+  {c:"之",p:"zhī",pos:"particle",e:"possessive/linking particle (literary)",ex:"成功之路。",ee:"The road to success."},
+  {c:"支持",p:"zhī chí",pos:"v",e:"to support",ex:"支持你的决定。",ee:"Support your decision."},
+  {c:"知识",p:"zhī shi",pos:"n",e:"knowledge",ex:"获取知识。",ee:"Acquire knowledge."},
+  {c:"值得",p:"zhí de",pos:"v",e:"to be worth it, to deserve",ex:"值得尝试。",ee:"Worth trying."},
+  {c:"植物",p:"zhí wù",pos:"n",e:"plant (botanical)",ex:"各种植物。",ee:"Various plants."},
+  {c:"直接",p:"zhí jiē",pos:"adj",e:"direct; directly",ex:"直接说吧。",ee:"Just say it directly."},
+  {c:"职业",p:"zhí yè",pos:"n",e:"occupation, profession, career",ex:"选择职业。",ee:"Choose a career."},
+  {c:"只好",p:"zhǐ hǎo",pos:"adv",e:"have no choice but to, can only",ex:"只好等了。",ee:"Have no choice but to wait."},
+  {c:"只要",p:"zhǐ yào",pos:"conj",e:"as long as, provided that",ex:"只要努力就会成功。",ee:"As long as you work hard, you will succeed."},
+  {c:"指",p:"zhǐ",pos:"v",e:"to point at, to refer to",ex:"指出问题。",ee:"Point out the problem."},
+  {c:"至少",p:"zhì shǎo",pos:"adv",e:"at least",ex:"至少一小时。",ee:"At least one hour."},
+  {c:"质量",p:"zhì liàng",pos:"n",e:"quality",ex:"质量很好。",ee:"The quality is very good."},
+  {c:"重",p:"zhòng",pos:"adj",e:"heavy, weighty, important",ex:"这个很重。",ee:"This is very heavy."},
+  {c:"重点",p:"zhòng diǎn",pos:"n",e:"key point, focus, emphasis",ex:"学习重点。",ee:"Key points of study."},
+  {c:"重视",p:"zhòng shì",pos:"v",e:"to attach importance to, to value",ex:"重视教育。",ee:"Attach importance to education."},
+  {c:"周围",p:"zhōu wéi",pos:"n",e:"surroundings, around",ex:"周围的环境。",ee:"The surrounding environment."},
+  {c:"主意",p:"zhǔ yi",pos:"n",e:"idea, plan, decision",ex:"好主意！",ee:"Good idea!"},
+  {c:"祝贺",p:"zhù hè",pos:"v",e:"to congratulate",ex:"祝贺你！",ee:"Congratulations!"},
+  {c:"著名",p:"zhù míng",pos:"adj",e:"famous, well-known, renowned",ex:"著名的地方。",ee:"A famous place."},
+  {c:"专门",p:"zhuān mén",pos:"adj",e:"special, specialised; specially",ex:"专门学习中文。",ee:"Specially study Chinese."},
+  {c:"专业",p:"zhuān yè",pos:"n",e:"major, specialty; professional",ex:"学什么专业？",ee:"What is your major?"},
+  {c:"转",p:"zhuǎn",pos:"v",e:"to turn, to change direction",ex:"转弯。",ee:"Make a turn."},
+  {c:"赚",p:"zhuàn",pos:"v",e:"to earn, to make money",ex:"赚钱。",ee:"Earn money."},
+  {c:"准确",p:"zhǔn què",pos:"adj",e:"accurate, precise",ex:"答案准确。",ee:"The answer is accurate."},
+  {c:"准时",p:"zhǔn shí",pos:"adj",e:"on time, punctual",ex:"准时到达。",ee:"Arrive on time."},
+  {c:"仔细",p:"zǐ xì",pos:"adj",e:"careful, meticulous",ex:"仔细检查。",ee:"Check carefully."},
+  {c:"自然",p:"zì rán",pos:"n",e:"nature; natural",ex:"自然环境。",ee:"Natural environment."},
+  {c:"自信",p:"zì xìn",pos:"adj",e:"confident; self-confidence",ex:"要有自信。",ee:"Be self-confident."},
+  {c:"总结",p:"zǒng jié",pos:"v",e:"to summarise; summary",ex:"总结经验。",ee:"Summarise experience."},
+  {c:"租",p:"zū",pos:"v",e:"to rent",ex:"租房子。",ee:"Rent a house."},
+  {c:"最好",p:"zuì hǎo",pos:"adv",e:"best, had better",ex:"最好早点来。",ee:"Better come early."},
+  {c:"尊重",p:"zūn zhòng",pos:"v",e:"to respect, to show consideration",ex:"尊重他人。",ee:"Respect others."},
+  {c:"左右",p:"zuǒ yòu",pos:"n",e:"left and right; approximately",ex:"两点左右。",ee:"Around two o'clock."},
+  {c:"作家",p:"zuò jiā",pos:"n",e:"writer, author",ex:"著名作家。",ee:"A famous writer."},
+  {c:"作用",p:"zuò yòng",pos:"n",e:"function, role, effect",ex:"发挥作用。",ee:"Play a role."},
+  {c:"作者",p:"zuò zhě",pos:"n",e:"author, writer",ex:"这本书的作者。",ee:"The author of this book."},
+  {c:"座",p:"zuò",pos:"n",e:"classifier for large buildings, mountains",ex:"一座山。",ee:"A mountain."},
+  {c:"座位",p:"zuò wèi",pos:"n",e:"seat",ex:"找座位。",ee:"Find a seat."},
+];
+
+// ===== STATE =====
+let idx = 0;
+let playing = false;
+let timer = null;
+let interval = 5000;
+let muted = false;
+let showExample = true;
+let randomMode = false;
+let readSentence = false;
+let order = V.map((_,i)=>i); // current play order
+const CIRC = 2 * Math.PI * 20;
+
+// ===== UTILS =====
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function pc(p) {
+  if (!p) return "pos-other";
+  if (p==="n"||p==="num") return "pos-n";
+  if (p.startsWith("v")) return "pos-v";
+  if (p.startsWith("adj")) return "pos-adj";
+  if (p.startsWith("adv")) return "pos-adv";
+  if (p.startsWith("conj")) return "pos-conj";
+  if (p.startsWith("prep")) return "pos-prep";
+  return "pos-other";
+}
+
+// ===== AUDIO ENGINE =====
+// We use a persistent Web Audio context with a silent oscillator to keep the
+// audio session alive when the screen locks, then play Google TTS through it.
+let audioCtx = null;
+let silentNode = null;
+let currentAudio = null;
+let speakGen = 0; // incremented each time we start a new speak() — old promises check this and bail
+
+function ensureAudioContext() {
+  if (audioCtx && audioCtx.state !== 'closed') return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  // Play a near-silent tone continuously — this keeps the audio session open
+  // on iOS/Android even when the screen turns off.
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.001; // inaudible but non-zero
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  silentNode = { osc, gain };
+}
+
+function resumeAudioContext() {
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function speakGoogle(text, lang, gen) {
+  return new Promise((resolve) => {
+    // If a newer speak() has started, bail immediately
+    if (gen !== speakGen) { resolve(); return; }
+    resumeAudioContext();
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+    const audio = new Audio(url);
+    currentAudio = audio;
+    const done = () => { currentAudio = null; resolve(); };
+    audio.onended = done;
+    audio.onerror = done;
+    audio.play().catch(done);
+  });
+}
+
+function stopCurrentAudio() {
+  speakGen++; // invalidates all in-progress speakGoogle calls
+  if (currentAudio) {
+    try { currentAudio.pause(); currentAudio.src = ""; } catch(e) {}
+    currentAudio = null;
+  }
+}
+
+function gap(ms, gen) {
+  return new Promise(r => setTimeout(() => {
+    if (gen !== speakGen) r(); // bail early if superseded
+    else r();
+  }, ms));
+}
+
+async function speak(w) {
+  const gen = ++speakGen;
+  if (!muted) {
+    try {
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: w.c + '  ' + w.p,
+          artist: w.e,
+          album: 'HSK 4 · 600 Characters',
+        });
+      }
+      await speakGoogle(w.c, 'zh-CN', gen);
+      if (gen === speakGen) await gap(350, gen);
+      if (gen === speakGen) await speakGoogle(w.e.split(',')[0].trim(), 'en-US', gen);
+      if (gen === speakGen && readSentence) {
+        await gap(500, gen);
+        if (gen === speakGen) await speakGoogle(w.ex, 'zh-CN', gen);
+        if (gen === speakGen) await gap(350, gen);
+        if (gen === speakGen) await speakGoogle(w.ee, 'en-US', gen);
+      }
+    } catch(e) {
+      // silently fail
+    }
+  }
+  return gen; // always returned — caller checks gen === speakGen to confirm still current
+}
+
+function toggleSentence() {
+  readSentence = !readSentence;
+  const btn = document.getElementById("sentBtn");
+  btn.innerHTML = readSentence ? "🗣 Sentences On" : "🗣 Sentences Off";
+  btn.classList.toggle("tog-on", readSentence);
+
+  // Disable speed controls in sentence mode — timing is driven by audio length
+  document.querySelectorAll('.sp-btn, .speed-label').forEach(b => {
+    b.disabled = readSentence;
+    b.style.opacity = readSentence ? '0.3' : '1';
+  });
+  document.querySelector('.speed-label').style.opacity = readSentence ? '0.3' : '1';
+
+  stopCurrentAudio();
+  clearRing();
+  if (playing) show(idx);
+}
+
+// Resume audio context on any user interaction (required by browsers)
+['touchstart','touchend','click','keydown'].forEach(ev => {
+  document.addEventListener(ev, () => {
+    ensureAudioContext();
+    resumeAudioContext();
+  }, { once: false, passive: true });
+});
+
+// Handle page visibility — resume when user returns
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) resumeAudioContext();
+});
+
+// Register MediaSession action handlers for lock screen controls
+function setupMediaSession() {
+  if (!('mediaSession' in navigator)) return;
+  navigator.mediaSession.setActionHandler('nexttrack', () => next());
+  navigator.mediaSession.setActionHandler('previoustrack', () => prev());
+  navigator.mediaSession.setActionHandler('play', () => { if (!playing) play(); });
+  navigator.mediaSession.setActionHandler('pause', () => { if (playing) pause(); });
+}
+
+// ===== DISPLAY =====
+function show(i) {
+  idx = i;
+  const w = V[order[idx]];
+
+  // Re-trigger animations
+  ['charMain','pinyinMain','meaningMain','posBadge','exWrap'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+  });
+
+  document.getElementById("charMain").textContent = w.c;
+
+  // Scale font size based on character count so long words always fit
+  const len = w.c.length;
+  const vw = window.innerWidth;
+  let size;
+  if (len === 1)      size = Math.min(vw * 0.52, 200);
+  else if (len === 2) size = Math.min(vw * 0.38, 160);
+  else if (len === 3) size = Math.min(vw * 0.26, 110);
+  else if (len === 4) size = Math.min(vw * 0.20, 88);
+  else                size = Math.min(vw * 0.16, 70);
+  document.getElementById("charMain").style.fontSize = size + "px";
+  document.getElementById("pinyinMain").textContent = w.p;
+  document.getElementById("posBadge").textContent = w.pos;
+  document.getElementById("posBadge").className = "pos-badge " + pc(w.pos);
+  document.getElementById("meaningMain").textContent = w.e;
+  document.getElementById("exMain").textContent = w.ex;
+  document.getElementById("exEn").textContent = w.ee;
+  document.getElementById("stageBg").textContent = w.c;
+  document.getElementById("curNum").textContent = idx + 1;
+  document.getElementById("progFill").style.width = ((idx+1)/V.length*100)+"%";
+
+  // Ring stays empty while audio plays
+  clearRing();
+
+  speak(w).then((gen) => {
+    if (gen !== speakGen || !playing) return;
+    if (readSentence) {
+      // Sentence mode: just a short breath then next card, no ring
+      advanceAfterSpeech();
+    } else {
+      // Timer mode: NOW start the ring countdown for the pause gap
+      startRing();
+      scheduleNext();
+    }
+  });
+}
+
+// ===== TIMER RING =====
+let ringStart = 0;
+let ringRAF = null;
+
+function clearRing() {
+  if (ringRAF) { cancelAnimationFrame(ringRAF); ringRAF = null; }
+  if (timer) { clearTimeout(timer); timer = null; }
+  const circle = document.getElementById("timerCircle");
+  circle.style.strokeDashoffset = 0;
+}
+
+function startRing() {
+  if (ringRAF) cancelAnimationFrame(ringRAF);
+  ringStart = Date.now();
+  animateRing();
+}
+
+function animateRing() {
+  const elapsed = Date.now() - ringStart;
+  const pct = Math.min(elapsed / interval, 1);
+  const circle = document.getElementById("timerCircle");
+  circle.style.strokeDashoffset = CIRC * pct;
+  if (pct < 1 && playing) {
+    ringRAF = requestAnimationFrame(animateRing);
+  }
+}
+
+// ===== PLAYBACK =====
+function startPlayer() {
+  ensureAudioContext();
+  setupMediaSession();
+  document.getElementById("startScreen").classList.add("gone");
+  document.getElementById("swipeHint").style.display = "block";
+  setTimeout(()=>{ document.getElementById("swipeHint").style.display = "none"; }, 4000);
+  idx = 0;
+  show(0);
+  play();
+}
+
+function play() {
+  playing = true;
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+  const btn = document.getElementById("playBtn");
+  btn.innerHTML = "⏸ Pause";
+  btn.classList.add("active");
+  btn.classList.remove("primary");
+  // Don't re-call show() here — startPlayer already called it.
+  // Just kick off the audio+schedule chain for the current card.
+  const w = V[order[idx]];
+  speak(w).then((gen) => {
+    if (gen !== speakGen || !playing) return;
+    if (readSentence) {
+      advanceAfterSpeech();
+    } else {
+      startRing();
+      scheduleNext();
+    }
+  });
+}
+
+function pause() {
+  playing = false;
+  stopCurrentAudio();
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+  const btn = document.getElementById("playBtn");
+  btn.innerHTML = "▶ Play";
+  btn.classList.remove("active");
+  btn.classList.add("primary");
+  if (timer) clearTimeout(timer);
+  clearRing();
+}
+
+function togglePlay() {
+  const ss = document.getElementById("startScreen");
+  if (!ss.classList.contains("gone")) { startPlayer(); return; }
+  if (playing) pause(); else play();
+}
+
+function advanceAfterSpeech() {
+  setTimeout(() => {
+    if (!playing || !readSentence) return;
+    if (idx < V.length - 1) { idx++; show(idx); }
+    else finish();
+  }, 800);
+}
+
+function finish() {
+  pause();
+  document.getElementById("charMain").textContent = "🎉";
+  document.getElementById("pinyinMain").textContent = "COMPLETE!";
+  document.getElementById("meaningMain").textContent = "You've reviewed all 600 HSK 4 characters. 加油！";
+  document.getElementById("exMain").textContent = "";
+  document.getElementById("exEn").textContent = "";
+}
+
+function scheduleNext() {
+  // Only used in timer mode. Called after audio finishes.
+  // interval = extra pause to linger on the card before moving on.
+  if (timer) clearTimeout(timer);
+  if (readSentence) return;
+  timer = setTimeout(() => {
+    if (!playing || readSentence) return;
+    if (idx < V.length - 1) {
+      idx++;
+      show(idx);
+    } else {
+      finish();
+    }
+  }, interval);
+}
+
+function next() {
+  stopCurrentAudio();
+  clearRing();
+  if (idx < V.length - 1) { idx++; show(idx); }
+}
+
+function prev() {
+  stopCurrentAudio();
+  clearRing();
+  if (idx > 0) { idx--; show(idx); }
+}
+
+function jumpTo(i) {
+  stopCurrentAudio();
+  clearRing();
+  show(i);
+}
+
+// ===== SPEED =====
+function setSpeed(s) {
+  interval = s * 1000;
+  [1,3,5,7,10].forEach(x => {
+    document.getElementById("sp"+x).classList.toggle("on", x===s);
+  });
+}
+
+// ===== MUTE =====
+function toggleMute() {
+  muted = !muted;
+  const btn = document.getElementById("muteBtn");
+  btn.innerHTML = muted ? "🔇 Muted" : "🔊 Sound";
+  btn.classList.toggle("tog-on", muted);
+}
+
+// ===== EXAMPLE TOGGLE =====
+function toggleExample() {
+  showExample = !showExample;
+  document.getElementById("exWrap").classList.toggle("hidden", !showExample);
+  const btn = document.getElementById("exBtn");
+  btn.innerHTML = showExample ? "📖 Examples On" : "📖 Examples Off";
+  btn.classList.toggle("tog-on", !showExample);
+}
+
+// ===== RANDOM MODE =====
+function toggleRandom() {
+  randomMode = !randomMode;
+  const btn = document.getElementById("rndBtn");
+  btn.classList.toggle("rnd-on", randomMode);
+  btn.innerHTML = randomMode ? "🔀 Random On" : "🔀 Random";
+  if (randomMode) {
+    order = shuffle(V.map((_,i)=>i));
+  } else {
+    order = V.map((_,i)=>i);
+  }
+  stopCurrentAudio();
+  clearRing();
+  idx = 0;
+  show(0);
+}
+
+// ===== KEYBOARD =====
+document.addEventListener("keydown", e => {
+  if (e.key===" "||e.key==="k") { e.preventDefault(); togglePlay(); }
+  else if (e.key==="ArrowRight"||e.key==="l") next();
+  else if (e.key==="ArrowLeft"||e.key==="j") prev();
+  else if (e.key==="m") toggleMute();
+  else if (e.key==="e") toggleExample();
+  else if (e.key==="r") toggleRandom();
+});
+
+// ===== SWIPE =====
+let touchStartX = 0;
+let touchStartY = 0;
+document.getElementById("stage").addEventListener("touchstart", e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, {passive:true});
+document.getElementById("stage").addEventListener("touchend", e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+    if (dx < 0) next(); else prev();
+  }
+}, {passive:true});
+
+// Set total
+document.getElementById("totalNum").textContent = V.length;
+</script>
+</body>
+</html>
